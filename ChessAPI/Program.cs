@@ -10,11 +10,15 @@ class Program
         string? username = string.Empty;
         
         // Username will become dynamic next major update
+        // These will be seated data to make a select menu
         
-        // username = "magnuscarlsen";
-        // username = "hikaru";
-        username = "gothamchess";
-        
+        // username = "magnuscarlsen"; // Premium + no streamer
+        // username = "hikaru"; // Streamer + Premium
+        // username = "gothamchess"; // Streamer
+        // username = "synxxxxxx"; // Basic
+        // username = "dewa_kipas"; // Banned
+        // username = "erik"; // Staff
+        // username = "nox"; // Mod
         
         string basePlayerURL = "https://api.chess.com/pub/player/";
         string profileUrl = string.Empty;
@@ -26,7 +30,7 @@ class Program
         }
         
         // Use "de-DE" for dot (1.234), or "fr-FR" for space (1 234)
-        CultureInfo numberFormat = new CultureInfo("de-DE"); 
+        CultureInfo format = new CultureInfo("de-DE"); 
 
         using HttpClient client = new HttpClient();
         client.DefaultRequestHeaders
@@ -56,11 +60,20 @@ class Program
                 new Markup(
                     $"[bold yellow]Player Profile[/]\n\n" +
                     $"[bold]Name:[/] {player?.name ?? "N/A"}\n" +
-                    $"[bold]ID:[/] {player?.player_id.ToString("N0", numberFormat) ?? "N/A"}\n" +
+                    $"[bold]ID:[/] {player?.player_id.ToString("N0", format) ?? "N/A"}\n" +
                     $"[bold]League:[/] {player?.league ?? "N/A"}\n" +
-                    $"[bold]FIDE Rating:[/] {stats?.fide.ToString("N0", numberFormat) ?? "N/A"}\n" +
-                    $"[bold]Status:[/] {player?.status ?? "N/A"}\n" +
-                    $"[bold]Followers:[/] {player?.followers.ToString("N0", numberFormat) ?? "N/A"}\n" +
+                    $"[bold]FIDE Rating:[/] {stats?.fide.ToString("N0", format) ?? "N/A"}\n" +
+                    $"[bold]Status:[/] " +
+                    $"{(
+                        player?.status == "closed:fair_play_violations" ? "[red bold]BANNED[/]" 
+                        : player?.status == "closed" ? "[red bold]CLOSED[/]" 
+                        : player?.status == "mod" ? "[#005faf bold]MODERATOR[/]" 
+                        : player?.status == "staff" ? "[green bold]STAFF[/]" 
+                        : player?.status == "premium" ? "[#00ffff bold]PREMIUM[/]" 
+                        : player?.status == "basic" ? "[#4e7837 bold]BASIC[/]" 
+                        : player?.status ?? "N/A"
+                        )}\n" +
+                    $"[bold]Followers:[/] {player?.followers.ToString("N0", format) ?? "N/A"}\n" +
                     $"[bold]Location:[/] {player?.location ?? "N/A"}\n" +
                     $"[bold]Last Online:[/] {(player?.last_online != null ? UnixToDate(player.last_online) : "N/A")}\n" +
                     $"[bold]Joined:[/] {(player?.joined != null ? UnixToDate(player.joined) : "N/A")}\n" +
@@ -107,76 +120,76 @@ class Program
                 "[bold]Daily[/]",
                 modeStats.chess_daily?
                     .last?.rating
-                    .ToString("N0", numberFormat) ?? "N/A",
+                    .ToString("N0", format) ?? "N/A",
                 modeStats.chess_daily?
                     .best?.rating
-                    .ToString("N0", numberFormat) ?? "N/A",
+                    .ToString("N0", format) ?? "N/A",
                 modeStats.chess_daily?
                     .record?.win
-                    .ToString("N0", numberFormat) ?? "N/A",
+                    .ToString("N0", format) ?? "N/A",
                 modeStats.chess_daily?
                     .record?.draw
-                    .ToString("N0", numberFormat) ?? "N/A",
+                    .ToString("N0", format) ?? "N/A",
                 modeStats.chess_daily?
                     .record?.loss
-                    .ToString("N0", numberFormat) ?? "N/A"
+                    .ToString("N0", format) ?? "N/A"
             );
             
             table.AddRow(
                 "[bold]Blitz[/]",
                 modeStats.chess_blitz?
                     .last?.rating
-                    .ToString("N0", numberFormat) ?? "N/A",
+                    .ToString("N0", format) ?? "N/A",
                 modeStats.chess_blitz?
                     .best?.rating
-                    .ToString("N0", numberFormat) ?? "N/A",
+                    .ToString("N0", format) ?? "N/A",
                 modeStats.chess_blitz?
                     .record?.win
-                    .ToString("N0", numberFormat) ?? "N/A",
+                    .ToString("N0", format) ?? "N/A",
                 modeStats.chess_blitz?
                     .record?.draw
-                    .ToString("N0", numberFormat) ?? "N/A",
+                    .ToString("N0", format) ?? "N/A",
                 modeStats.chess_blitz?
                     .record?.loss
-                    .ToString("N0", numberFormat) ?? "N/A"
+                    .ToString("N0", format) ?? "N/A"
             );
 
             table.AddRow(
                 "[bold]Bullet[/]",
                 modeStats.chess_bullet?
                     .last?.rating
-                    .ToString("N0", numberFormat) ?? "N/A",
+                    .ToString("N0", format) ?? "N/A",
                 modeStats.chess_bullet?
                     .best?.rating
-                    .ToString("N0", numberFormat) ?? "N/A",
+                    .ToString("N0", format) ?? "N/A",
                 modeStats.chess_bullet?
                     .record?.win
-                    .ToString("N0", numberFormat) ?? "N/A",
+                    .ToString("N0", format) ?? "N/A",
                 modeStats.chess_bullet?
                     .record?.draw
-                    .ToString("N0", numberFormat) ?? "N/A",
+                    .ToString("N0", format) ?? "N/A",
                 modeStats.chess_bullet?
                     .record?.loss
-                    .ToString("N0", numberFormat) ?? "N/A"
+                    .ToString("N0", format) ?? "N/A"
             );
 
             table.AddRow(
                 "[bold]Rapid[/]",
                 modeStats.chess_rapid?
                     .last?.rating
-                    .ToString("N0", numberFormat) ?? "N/A",
+                    .ToString("N0", format) ?? "N/A",
                 modeStats.chess_rapid?
                     .best?.rating
-                    .ToString("N0", numberFormat) ?? "N/A",
+                    .ToString("N0", format) ?? "N/A",
                 modeStats.chess_rapid?
                     .record?.win
-                    .ToString("N0", numberFormat) ?? "N/A",
+                    .ToString("N0", format) ?? "N/A",
                 modeStats.chess_rapid?
                     .record?.draw
-                    .ToString("N0", numberFormat) ?? "N/A",
+                    .ToString("N0", format) ?? "N/A",
                 modeStats.chess_rapid?
                     .record?.loss
-                    .ToString("N0", numberFormat) ?? "N/A"
+                    .ToString("N0", format) ?? "N/A"
             );
             
             AnsiConsole.Write(table);
@@ -198,10 +211,10 @@ class Program
             tacticsTable.AddRow(
                 stats.tactics?
                     .highest?.rating
-                    .ToString("N0", numberFormat) ?? "N/A",
+                    .ToString("N0", format) ?? "N/A",
                 stats.tactics?
                     .lowest?.rating
-                    .ToString("N0", numberFormat) ?? "N/A",
+                    .ToString("N0", format) ?? "N/A",
                 stats.tactics?
                     .highest?.date != null ? UnixToDate(stats.tactics.highest.date) : "N/A",
                 stats.tactics?
