@@ -4,8 +4,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessAPI", "ChessAPI\ChessA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessAPI.Data", "ChessAPI.Data\ChessAPI.Data.csproj", "{9C7FEDEE-E249-467A-B6DC-79A5119635FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessAPI.Service", "ChessAPI.Service\ChessAPI.Service.csproj", "{F5004019-7216-43D7-8FFE-6EB255D01529}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,9 +18,5 @@ Global
 		{9C7FEDEE-E249-467A-B6DC-79A5119635FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C7FEDEE-E249-467A-B6DC-79A5119635FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C7FEDEE-E249-467A-B6DC-79A5119635FB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F5004019-7216-43D7-8FFE-6EB255D01529}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F5004019-7216-43D7-8FFE-6EB255D01529}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F5004019-7216-43D7-8FFE-6EB255D01529}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F5004019-7216-43D7-8FFE-6EB255D01529}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

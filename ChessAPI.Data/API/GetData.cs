@@ -1,3 +1,6 @@
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 using ChessAPI.Models;
 using Newtonsoft.Json;
 
