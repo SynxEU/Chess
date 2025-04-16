@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using ChessAPI.Models;
 using System.Globalization;
+using ChessAPI.DataCollect.API;
 using Spectre.Console;
 
 class Program
@@ -15,10 +16,10 @@ class Program
         // username = "magnuscarlsen"; // Premium + no streamer
         // username = "hikaru"; // Streamer + Premium
         // username = "gothamchess"; // Streamer
-        // username = "synxxxxxx"; // Basic
+        // username = "synx_eu"; // Basic
         // username = "dewa_kipas"; // Banned
         // username = "erik"; // Staff
-        // username = "nox"; // Mod
+        username = "nox"; // Mod
         
         string basePlayerURL = "https://api.chess.com/pub/player/";
         string profileUrl = string.Empty;
@@ -28,39 +29,26 @@ class Program
         {
             profileUrl = basePlayerURL + username.ToLower();
         }
+        else
+        {
+            Console.WriteLine($"Failed to fetch data. " +
+                              $"No username provided. " +
+                              $"Please try again.");
+            return;
+        }
         
         // Use "de-DE" for dot (1.234), or "fr-FR" for space (1 234)
         CultureInfo format = new CultureInfo("de-DE"); 
 
-        using HttpClient client = new HttpClient();
-        client.DefaultRequestHeaders
-            .UserAgent
-            .ParseAdd("CSharpApp/1.0");
-
-        HttpResponseMessage profileResponse = await client.GetAsync(profileUrl);
-        HttpResponseMessage statsResponse = await client.GetAsync(string.Concat(profileUrl, "/stats"));
-
-        if (!statsResponse.IsSuccessStatusCode 
-            || !profileResponse.IsSuccessStatusCode)
-        {
-            Console.WriteLine($"Failed to fetch data. " +
-                              $"Status codes:\n" +
-                              $" Stats = {statsResponse.StatusCode}\n" +
-                              $" Profile = {profileResponse.StatusCode}");
-            return;
-        }
-
-        string statsJson = await statsResponse.Content.ReadAsStringAsync();
-        string profileJson = await profileResponse.Content.ReadAsStringAsync();
-
-        Stats? stats = JsonConvert.DeserializeObject<Stats>(statsJson);
-        ChessPlayer? player = JsonConvert.DeserializeObject<ChessPlayer>(profileJson);
+        Stats? stats = await GetData.GetStats(string.Concat(profileUrl, "/stats"));
+        ChessPlayer? player = await GetData.GetPlayer(profileUrl);
         
         AnsiConsole.Write(new Panel(
                 new Markup(
                     $"[bold yellow]Player Profile[/]\n\n" +
-                    $"[bold]Name:[/] {player?.name ?? "N/A"}\n" +
                     $"[bold]ID:[/] {player?.player_id.ToString("N0", format) ?? "N/A"}\n" +
+                    $"[bold]Name:[/] {player?.name ?? "No name provided"}\n" +
+                    $"[bold]Username:[/] {player?.username ?? "N/A"}\n" +
                     $"[bold]League:[/] {player?.league ?? "N/A"}\n" +
                     $"[bold]FIDE Rating:[/] {stats?.fide.ToString("N0", format) ?? "N/A"}\n" +
                     $"[bold]Status:[/] " +
