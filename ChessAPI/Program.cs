@@ -1,25 +1,30 @@
 ﻿using Newtonsoft.Json;
 using ChessAPI.Models;
 using System.Globalization;
+using ChessAPI.DataCollect;
 using ChessAPI.DataCollect.API;
+using Microsoft.EntityFrameworkCore;
 using Spectre.Console;
 
 class Program
 {
-    static async Task Main()
+    static async Task Main(string[] args)
     {
+        var factory = new DbContextFactory();
+        var context = factory.CreateDbContext(args);
+        
         string? username = string.Empty;
         
         // Username will become dynamic next major update
         // These will be seated data to make a select menu
         
         // username = "magnuscarlsen"; // Premium + no streamer
-        // username = "hikaru"; // Streamer + Premium
+        username = "hikaru"; // Streamer + Premium
         // username = "gothamchess"; // Streamer
         // username = "synx_eu"; // Basic
         // username = "dewa_kipas"; // Banned
         // username = "erik"; // Staff
-        username = "nox"; // Mod
+        // username = "nox"; // Mod
         
         string basePlayerURL = "https://api.chess.com/pub/player/";
         string profileUrl = string.Empty;
@@ -39,9 +44,9 @@ class Program
         
         // Use "de-DE" for dot (1.234), or "fr-FR" for space (1 234)
         CultureInfo format = new CultureInfo("de-DE"); 
-
-        Stats? stats = await GetData.GetStats(string.Concat(profileUrl, "/stats"));
-        ChessPlayer? player = await GetData.GetPlayer(profileUrl);
+        
+        ChessPlayer? player = await GetData.GetPlayer(profileUrl, context);
+        Stats? stats = await GetData.GetStats(string.Concat(profileUrl, "/stats"), context, player);
         
         AnsiConsole.Write(new Panel(
                 new Markup(
