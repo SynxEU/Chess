@@ -4,7 +4,7 @@ public class Stats
 {
     public int id { get; set; }
         
-    public int ChessPlayerId { get; set; }
+    public int ChessId { get; set; }
     public ChessPlayer ChessPlayer { get; set; }
 
     public ChessDaily? chess_daily { get; set; }

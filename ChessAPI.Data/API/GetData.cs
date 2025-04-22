@@ -30,11 +30,11 @@ public class GetData
         if (stats != null)
         {
             stats.CreatedAt = DateTime.UtcNow;
-            stats.ChessPlayerId = player.player_id;
+            stats.ChessId = player.ChessId;
             stats.ChessPlayer = player;
             
             bool alreadyExists = context.Stats
-                .Any(s => s.ChessPlayerId == player.player_id 
+                .Any(s => s.ChessId == player.ChessId
                           && s.CreatedAt == stats.CreatedAt);
 
             if (!alreadyExists)
@@ -72,9 +72,11 @@ public class GetData
             player.FetchedAt = DateTime.UtcNow;
 
             bool alreadyExists = context.ChessPlayers
-                .Any(p => p.username == player.username && p.FetchedAt == player.FetchedAt);
+                .Any(p => p.username == player.username 
+                          && p.FetchedAt == player.FetchedAt);
 
             if (!alreadyExists)
+                
             {
                 context.ChessPlayers.Add(player);
                 await context.SaveChangesAsync();

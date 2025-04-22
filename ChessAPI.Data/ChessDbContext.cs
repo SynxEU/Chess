@@ -13,7 +13,6 @@ public class ChessDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configure ChessBlitz as an owned entity
         modelBuilder.Entity<ChessBlitz>()
             .OwnsOne(c => c.last);
         modelBuilder.Entity<ChessBlitz>()
@@ -21,7 +20,6 @@ public class ChessDbContext : DbContext
         modelBuilder.Entity<ChessBlitz>()
             .OwnsOne(c => c.record);
 
-        // Configure ChessBullet as an owned entity
         modelBuilder.Entity<ChessBullet>()
             .OwnsOne(c => c.last);
         modelBuilder.Entity<ChessBullet>()
@@ -29,9 +27,8 @@ public class ChessDbContext : DbContext
         modelBuilder.Entity<ChessBullet>()
             .OwnsOne(c => c.record);
 
-        // ChessDaily is now a regular entity and should not be owned
         modelBuilder.Entity<ChessDaily>()
-            .HasKey(c => c.id); // Primary key for ChessDaily
+            .HasKey(c => c.id);
         modelBuilder.Entity<ChessDaily>()
             .OwnsOne(c => c.last);
         modelBuilder.Entity<ChessDaily>()
@@ -39,7 +36,6 @@ public class ChessDbContext : DbContext
         modelBuilder.Entity<ChessDaily>()
             .OwnsOne(c => c.record);
 
-        // Configure ChessRapid as an owned entity
         modelBuilder.Entity<ChessRapid>()
             .OwnsOne(c => c.last);
         modelBuilder.Entity<ChessRapid>()
@@ -47,31 +43,26 @@ public class ChessDbContext : DbContext
         modelBuilder.Entity<ChessRapid>()
             .OwnsOne(c => c.record);
 
-        // Configure Tactics as an owned entity
         modelBuilder.Entity<Tactics>()
             .OwnsOne(t => t.highest);
         modelBuilder.Entity<Tactics>()
             .OwnsOne(t => t.lowest);
 
-        // Configure ChessPlayer and its streaming platforms
         modelBuilder.Entity<ChessPlayer>()
             .OwnsMany(p => p.streaming_platforms);
 
-        // Configure ChessPlayer's index
         modelBuilder.Entity<ChessPlayer>()
             .HasIndex(p => new { p.username, p.FetchedAt })
             .IsUnique(false);
 
-        // Configure the Stats entity and its relationship with ChessPlayer
         modelBuilder.Entity<Stats>()
             .HasOne(s => s.ChessPlayer)
-            .WithMany(p => p.Stats) // One ChessPlayer can have many Stats
-            .HasForeignKey(s => s.ChessPlayerId);
-
-        // Configure the CreatedAt timestamp for Stats
+            .WithMany(p => p.Stats)
+            .HasForeignKey(s => s.ChessId);
+        
         modelBuilder.Entity<Stats>()
             .Property(s => s.CreatedAt)
-            .HasDefaultValueSql("GETDATE()"); // Automatically set to the current date/time
+            .HasDefaultValueSql("GETDATE()");
     }
 
 }
