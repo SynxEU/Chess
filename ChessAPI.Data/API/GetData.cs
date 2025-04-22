@@ -34,7 +34,8 @@ public class GetData
             stats.ChessPlayer = player;
             
             bool alreadyExists = context.Stats
-                .Any(s => s.ChessPlayerId == player.playerId && s.CreatedAt == stats.CreatedAt);
+                .Any(s => s.ChessPlayerId == player.playerId 
+                          && s.CreatedAt == stats.CreatedAt);
 
             if (!alreadyExists)
             {

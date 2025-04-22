@@ -18,6 +18,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\ChessAPI.Data\ChessAPI.Data.csproj" />
+      <ProjectReference Include="..\ChessAPI.Services\ChessAPI.Services.csproj" />
     </ItemGroup>
 
 </Project>

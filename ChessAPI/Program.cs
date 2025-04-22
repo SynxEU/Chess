@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using ChessAPI.Models;
+﻿using ChessAPI.Models;
 using System.Globalization;
-using ChessAPI.DataCollect;
 using ChessAPI.DataCollect.API;
-using Microsoft.EntityFrameworkCore;
+using ChessAPI.Services.DTO.PlayerStats;
+using ChessAPI.Services.DTO.UserData;
+using ChessAPI.Services.Extenstions;
 using Spectre.Console;
 
 class Program
@@ -45,33 +45,33 @@ class Program
         // Use "de-DE" for dot (1.234), or "fr-FR" for space (1 234)
         CultureInfo format = new CultureInfo("de-DE"); 
         
-        ChessPlayer? player = await GetData.GetPlayer(profileUrl, context);
-        Stats? stats = await GetData.GetStats(string.Concat(profileUrl, "/stats"), context, player);
+        ChessPlayerDTO? player = (await GetData.GetPlayer(profileUrl, context)).ToDTO();
+        PlayerStatsDTO? stats = (await GetData.GetStats(string.Concat(profileUrl, "/stats"), context, player.ToModel())).ToDTO();
         
         AnsiConsole.Write(new Panel(
                 new Markup(
                     $"[bold yellow]Player Profile[/]\n\n" +
-                    $"[bold]ID:[/] {player?.player_id.ToString("N0", format) ?? "N/A"}\n" +
-                    $"[bold]Name:[/] {player?.name ?? "No name provided"}\n" +
-                    $"[bold]Username:[/] {player?.username ?? "N/A"}\n" +
-                    $"[bold]League:[/] {player?.league ?? "N/A"}\n" +
-                    $"[bold]FIDE Rating:[/] {stats?.fide.ToString("N0", format) ?? "N/A"}\n" +
+                    $"[bold]ID:[/] {player?.Player_id.ToString("N0", format) ?? "N/A"}\n" +
+                    $"[bold]Name:[/] {player?.Name ?? "No name provided"}\n" +
+                    $"[bold]Username:[/] {player?.Username ?? "N/A"}\n" +
+                    $"[bold]League:[/] {player?.League ?? "N/A"}\n" +
+                    $"[bold]FIDE Rating:[/] {stats?.Fide.ToString("N0", format) ?? "N/A"}\n" +
                     $"[bold]Status:[/] " +
                     $"{(
-                        player?.status == "closed:fair_play_violations" ? "[red bold]BANNED[/]" 
-                        : player?.status == "closed" ? "[red bold]CLOSED[/]" 
-                        : player?.status == "mod" ? "[#005faf bold]MODERATOR[/]" 
-                        : player?.status == "staff" ? "[green bold]STAFF[/]" 
-                        : player?.status == "premium" ? "[#00ffff bold]PREMIUM[/]" 
-                        : player?.status == "basic" ? "[#4e7837 bold]BASIC[/]" 
-                        : player?.status ?? "N/A"
+                        player?.Status == "closed:fair_play_violations" ? "[red bold]BANNED[/]" 
+                        : player?.Status == "closed" ? "[red bold]CLOSED[/]" 
+                        : player?.Status == "mod" ? "[#005faf bold]MODERATOR[/]" 
+                        : player?.Status == "staff" ? "[green bold]STAFF[/]" 
+                        : player?.Status == "premium" ? "[#00ffff bold]PREMIUM[/]" 
+                        : player?.Status == "basic" ? "[#4e7837 bold]BASIC[/]" 
+                        : player?.Status ?? "N/A"
                         )}\n" +
-                    $"[bold]Followers:[/] {player?.followers.ToString("N0", format) ?? "N/A"}\n" +
-                    $"[bold]Location:[/] {player?.location ?? "N/A"}\n" +
-                    $"[bold]Last Online:[/] {(player?.last_online != null ? UnixToDate(player.last_online) : "N/A")}\n" +
-                    $"[bold]Joined:[/] {(player?.joined != null ? UnixToDate(player.joined) : "N/A")}\n" +
-                    $"[bold]Verified:[/] {(player?.verified == true ? "[green]Yes[/]" : "[red]No[/]")}\n" +
-                    $"[bold]Is Streamer:[/] {(player?.is_streamer == true ? "[green]Yes[/]" : "[red]No[/]")}"
+                    $"[bold]Followers:[/] {player?.Followers.ToString("N0", format) ?? "N/A"}\n" +
+                    $"[bold]Location:[/] {player?.Location ?? "N/A"}\n" +
+                    $"[bold]Last Online:[/] {(player?.LastOnline != null ? UnixToDate(player.LastOnline) : "N/A")}\n" +
+                    $"[bold]Joined:[/] {(player?.Joined != null ? UnixToDate(player.Joined) : "N/A")}\n" +
+                    $"[bold]Verified:[/] {(player?.Verified == true ? "[green]Yes[/]" : "[red]No[/]")}\n" +
+                    $"[bold]Is Streamer:[/] {(player?.IsStreamer == true ? "[green]Yes[/]" : "[red]No[/]")}"
                 ))
             .Border(BoxBorder.Rounded)
             .Padding(new Padding(1)));
@@ -80,7 +80,7 @@ class Program
 
         
         if (player is 
-            { is_streamer: true })
+            { IsStreamer: true })
         {
             Table streamTable = new Table()
                 .Border(TableBorder.Rounded)
@@ -88,15 +88,15 @@ class Program
                 .AddColumn("[bold]Platform[/]")
                 .AddColumn("[bold]Channel URL[/]");
 
-            foreach (StreamingPlatform platform in player.streaming_platforms)
+            foreach (StreamingPlatformDTO platform in player.StreamingPlatforms)
             {
-                streamTable.AddRow(platform.type, platform.channel_url);
+                streamTable.AddRow(platform.Type, platform.ChannelUrl);
             }
 
             AnsiConsole.Write(streamTable);
         }
         
-        void WriteCombinedStats(string title, Stats modeStats)
+        void WriteCombinedStats(string title, PlayerStatsDTO modeStats)
         {
             Table table = new Table()
                 .Border(TableBorder.Rounded)
@@ -111,77 +111,77 @@ class Program
 
             table.AddRow(
                 "[bold]Daily[/]",
-                modeStats.chess_daily?
-                    .last?.rating
+                modeStats.ChessDaily?
+                    .Last?.Rating
                     .ToString("N0", format) ?? "N/A",
-                modeStats.chess_daily?
-                    .best?.rating
+                modeStats.ChessDaily?
+                    .Best?.Rating
                     .ToString("N0", format) ?? "N/A",
-                modeStats.chess_daily?
-                    .record?.win
+                modeStats.ChessDaily?
+                    .Record?.Win
                     .ToString("N0", format) ?? "N/A",
-                modeStats.chess_daily?
-                    .record?.draw
+                modeStats.ChessDaily?
+                    .Record?.Draw
                     .ToString("N0", format) ?? "N/A",
-                modeStats.chess_daily?
-                    .record?.loss
+                modeStats.ChessDaily?
+                    .Record?.Loss
                     .ToString("N0", format) ?? "N/A"
             );
             
             table.AddRow(
                 "[bold]Blitz[/]",
-                modeStats.chess_blitz?
-                    .last?.rating
+                modeStats.ChessBlitz?
+                    .Last?.Rating
                     .ToString("N0", format) ?? "N/A",
-                modeStats.chess_blitz?
-                    .best?.rating
+                modeStats.ChessBlitz?
+                    .Best?.Rating
                     .ToString("N0", format) ?? "N/A",
-                modeStats.chess_blitz?
-                    .record?.win
+                modeStats.ChessBlitz?
+                    .Record?.Win
                     .ToString("N0", format) ?? "N/A",
-                modeStats.chess_blitz?
-                    .record?.draw
+                modeStats.ChessBlitz?
+                    .Record?.Draw
                     .ToString("N0", format) ?? "N/A",
-                modeStats.chess_blitz?
-                    .record?.loss
+                modeStats.ChessBlitz?
+                    .Record?.Loss
                     .ToString("N0", format) ?? "N/A"
             );
 
             table.AddRow(
                 "[bold]Bullet[/]",
-                modeStats.chess_bullet?
-                    .last?.rating
+                modeStats.ChessBullet?
+                    .Last?.Rating
                     .ToString("N0", format) ?? "N/A",
-                modeStats.chess_bullet?
-                    .best?.rating
+                modeStats.ChessBullet?
+                    .Best?.Rating
                     .ToString("N0", format) ?? "N/A",
-                modeStats.chess_bullet?
-                    .record?.win
+                modeStats.ChessBullet?
+                    .Record?.Win
                     .ToString("N0", format) ?? "N/A",
-                modeStats.chess_bullet?
-                    .record?.draw
+                modeStats.ChessBullet?
+                    .Record?.Draw
                     .ToString("N0", format) ?? "N/A",
-                modeStats.chess_bullet?
-                    .record?.loss
+                modeStats.ChessBullet?
+                    .Record?.Loss
                     .ToString("N0", format) ?? "N/A"
             );
 
             table.AddRow(
                 "[bold]Rapid[/]",
-                modeStats.chess_rapid?
-                    .last?.rating
+                modeStats.ChessRapid?
+                    .Last?.Rating
                     .ToString("N0", format) ?? "N/A",
-                modeStats.chess_rapid?
-                    .best?.rating
+                modeStats.ChessRapid?
+                    .Best?.Rating
                     .ToString("N0", format) ?? "N/A",
-                modeStats.chess_rapid?
-                    .record?.win
+                modeStats.ChessRapid?
+                    .Record?.Win
                     .ToString("N0", format) ?? "N/A",
-                modeStats.chess_rapid?
-                    .record?.draw
+                modeStats.ChessRapid?
+                    .Record?.Draw
                     .ToString("N0", format) ?? "N/A",
-                modeStats.chess_rapid?
-                    .record?.loss
+                modeStats.ChessRapid?
+                    .Record?.Loss
                     .ToString("N0", format) ?? "N/A"
             );
             
@@ -191,7 +191,7 @@ class Program
         if (stats != null)
             WriteCombinedStats("Stats Overview", stats);
 
-        if (stats.tactics.highest.rating > 400)
+        if (stats.Tactics.Highest.Rating > 400)
         {
             Table tacticsTable = new Table()
                 .Border(TableBorder.Rounded)
@@ -202,16 +202,16 @@ class Program
                 .AddColumn("[bold]Lowest Date[/]");
 
             tacticsTable.AddRow(
-                stats.tactics?
-                    .highest?.rating
+                stats.Tactics?
+                    .Highest?.Rating
                     .ToString("N0", format) ?? "N/A",
-                stats.tactics?
-                    .lowest?.rating
+                stats.Tactics?
+                    .Lowest?.Rating
                     .ToString("N0", format) ?? "N/A",
-                stats.tactics?
-                    .highest?.date != null ? UnixToDate(stats.tactics.highest.date) : "N/A",
-                stats.tactics?
-                    .lowest?.date != null ? UnixToDate(stats.tactics.lowest.date) : "N/A"
+                stats.Tactics?
+                    .Highest?.Date != null ? UnixToDate(stats.Tactics.Highest.Date) : "N/A",
+                stats.Tactics?
+                    .Lowest?.Date != null ? UnixToDate(stats.Tactics.Lowest.Date) : "N/A"
             );
             
             AnsiConsole.Write(tacticsTable);

@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\ChessAPI.Data\ChessAPI.Data.csproj" />
+    </ItemGroup>
+
 </Project>

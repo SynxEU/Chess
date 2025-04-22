@@ -29,6 +29,6 @@ namespace ChessAPI.Models
         public List<StreamingPlatform> streaming_platforms { get; set; }
         public DateTime? FetchedAt { get; set; }
 
-        public ICollection<Stats> Stats { get; set; }
+        public List<Stats> Stats { get; set; }
     }
 }
