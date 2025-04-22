@@ -31,7 +31,6 @@ public class GetData
         {
             stats.CreatedAt = DateTime.UtcNow;
             stats.ChessId = player.ChessId;
-            stats.ChessPlayer = player;
             
             bool alreadyExists = context.Stats
                 .Any(s => s.ChessId == player.ChessId
