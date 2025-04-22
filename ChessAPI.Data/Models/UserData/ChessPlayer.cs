@@ -8,7 +8,7 @@ namespace ChessAPI.Models
     public class ChessPlayer
     {
         [Key]
-        public int playerId { get; set; }
+        public int ChessId { get; set; }
         public string? avatar { get; set; }
         public int player_id { get; set; }
 
@@ -22,13 +22,13 @@ namespace ChessAPI.Models
         public string? location { get; set; }
         public int last_online { get; set; }
         public int joined { get; set; }
-        public string status { get; set; }
+        public string? status { get; set; }
         public bool is_streamer { get; set; }
         public bool verified { get; set; }
         public string? league { get; set; }
-        public List<StreamingPlatform> streaming_platforms { get; set; }
+        public List<StreamingPlatform>? streaming_platforms { get; set; }
         public DateTime? FetchedAt { get; set; }
 
-        public List<Stats> Stats { get; set; }
+        public List<Stats>? Stats { get; set; }
     }
 }

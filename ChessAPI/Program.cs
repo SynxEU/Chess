@@ -19,7 +19,7 @@ class Program
         // These will be seated data to make a select menu
         
         // username = "magnuscarlsen"; // Premium + no streamer
-        username = "hikaru"; // Streamer + Premium
+        // username = "hikaru"; // Streamer + Premium
         // username = "gothamchess"; // Streamer
         // username = "synx_eu"; // Basic
         // username = "dewa_kipas"; // Banned
@@ -51,7 +51,7 @@ class Program
         AnsiConsole.Write(new Panel(
                 new Markup(
                     $"[bold yellow]Player Profile[/]\n\n" +
-                    $"[bold]ID:[/] {player?.Player_id.ToString("N0", format) ?? "N/A"}\n" +
+                    $"[bold]ID:[/] {player?.ChessId.ToString("N0", format) ?? "N/A"}\n" +
                     $"[bold]Name:[/] {player?.Name ?? "No name provided"}\n" +
                     $"[bold]Username:[/] {player?.Username ?? "N/A"}\n" +
                     $"[bold]League:[/] {player?.League ?? "N/A"}\n" +

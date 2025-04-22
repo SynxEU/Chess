@@ -23,7 +23,7 @@ public static class Mapping
 
     public static ChessPlayerDTO ToDTO(this ChessPlayer model) => new()
     {
-        Player_id = model.player_id,
+        ChessId = model.ChessId,
         Avatar = model.avatar,
         Url = model.url,
         Name = model.name,
@@ -48,7 +48,7 @@ public static class Mapping
 
     public static ChessPlayer ToModel(this ChessPlayerDTO dto) => new()
     {
-        player_id = dto.Player_id,
+        ChessId = dto.ChessId,
         avatar = dto.Avatar,
         url = dto.Url,
         name = dto.Name,

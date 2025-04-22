@@ -30,11 +30,11 @@ public class GetData
         if (stats != null)
         {
             stats.CreatedAt = DateTime.UtcNow;
-            stats.ChessPlayerId = player.playerId;
+            stats.ChessPlayerId = player.player_id;
             stats.ChessPlayer = player;
             
             bool alreadyExists = context.Stats
-                .Any(s => s.ChessPlayerId == player.playerId 
+                .Any(s => s.ChessPlayerId == player.player_id 
                           && s.CreatedAt == stats.CreatedAt);
 
             if (!alreadyExists)
