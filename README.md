@@ -44,16 +44,16 @@ Databasen inkluderer følgende entiteter: \
 **📂 Models** \
 UserData:
 - ChessPlayer: indeholder generel information om brugeren.
-- StreamingPlatform: information om hvorvidt brugeren streamer (f.eks. Twitch, YouTube).
+- StreamingPlatform: information om hvorvidt brugeren streamer (f.eks. Twitch, YouTube). \
 Modes:
-- ChessBlitz, ChessRapid, ChessBullet, ChessDaily: hver mode indeholder f.eks. antal spil, rating, winstreaks osv.
+- ChessBlitz, ChessRapid, ChessBullet, ChessDaily: hver mode indeholder f.eks. antal spil, rating, winstreaks osv. \
 PlayerStats:
 - Tactics: taktiske statistikker som puzzles løst, accuracy, m.m.
-- Stats: samlet statistik på tværs af modes.
+- Stats: samlet statistik på tværs af modes. \
 Records: toppræstationer inddelt i:
 - Best
 - Last
-- Record
+- Record \
 Scale:
 - Highest, Lowest: bruges f.eks. til at vise højeste og laveste rating over tid.
 
