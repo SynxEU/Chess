@@ -1,3 +1,8 @@
 /ChessAPI/obj/
 /ChessAPI/bin/
 /.idea
+/ChessAPI.Data/Migrations/
+/ChessAPI.Data/obj/
+/ChessAPI.Data/bin/
+/ChessAPI.Services/obj/
+/ChessAPI.Services/bin/

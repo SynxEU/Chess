@@ -1,0 +1,13 @@
+using ChessAPI.Services.DTO.Modes;
+
+namespace ChessAPI.Services.DTO.PlayerStats;
+
+public class PlayerStatsDTO
+{
+    public ChessDailyDTO ChessDaily { get; set; }
+    public ChessRapidDTO ChessRapid { get; set; }
+    public ChessBulletDTO ChessBullet { get; set; }
+    public ChessBlitzDTO ChessBlitz { get; set; }
+    public int Fide { get; set; }
+    public TacticsDTO Tactics { get; set; }
+}
