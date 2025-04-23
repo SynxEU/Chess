@@ -70,7 +70,7 @@ Databaseforbindelsen er sat op via `ChessDbContext` og benytter en LocalDB som s
    ```sh
    git clone https://github.com/SynxEU/Chess
    ```
-2.  Klon projektet:
+2.  Navigere til startup filen:
    ```sh
    cd ChessAPI
    ```
