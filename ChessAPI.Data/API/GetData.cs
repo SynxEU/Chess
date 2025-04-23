@@ -32,6 +32,7 @@ public class GetData
             stats.CreatedAt = DateTime.UtcNow;
             stats.ChessId = player.ChessId;
             
+            // Needs to be reworked, not checking how i wanted
             bool alreadyExists = context.Stats
                 .Any(s => s.ChessId == player.ChessId
                           && s.CreatedAt == stats.CreatedAt);
@@ -70,6 +71,7 @@ public class GetData
         {
             player.FetchedAt = DateTime.UtcNow;
 
+            // Needs to be reworked, not checking how i wanted
             bool alreadyExists = context.ChessPlayers
                 .Any(p => p.username == player.username 
                           && p.FetchedAt == player.FetchedAt);
