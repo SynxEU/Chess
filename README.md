@@ -40,6 +40,7 @@ Projektet er udviklet med følgende teknologier:
 
 ### Entities
 Databasen inkluderer følgende entiteter: \
+\
 📂 Models \
 UserData:
 - ChessPlayer: indeholder generel information om brugeren.
