@@ -46,7 +46,10 @@ class Program
         CultureInfo format = new CultureInfo("de-DE"); 
         
         ChessPlayerDTO? player = (await GetData.GetPlayer(profileUrl, context)).ToDTO();
-        PlayerStatsDTO? stats = (await GetData.GetStats(string.Concat(profileUrl, "/stats"), context, player.ToModel())).ToDTO();
+        PlayerStatsDTO? stats = (await GetData.GetStats(string.Concat(profileUrl, "/stats"), 
+            context, 
+            player.ToModel()))
+            .ToDTO();
         
         AnsiConsole.Write(new Panel(
                 new Markup(
