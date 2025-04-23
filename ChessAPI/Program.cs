@@ -52,6 +52,7 @@ class Program
                 new Markup(
                     $"[bold yellow]Player Profile[/]\n\n" +
                     $"[bold]ID:[/] {player?.ChessId.ToString("N0", format) ?? "N/A"}\n" +
+                    $"[bold]Chess.com ID:[/] {player?.playerId.ToString("N0", format) ?? "N/A"}\n" +
                     $"[bold]Name:[/] {player?.Name ?? "No name provided"}\n" +
                     $"[bold]Username:[/] {player?.Username ?? "N/A"}\n" +
                     $"[bold]League:[/] {player?.League ?? "N/A"}\n" +

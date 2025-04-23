@@ -6,7 +6,7 @@ public class ChessPlayerDTO
 {
     public int ChessId { get; set; }
     public string? Avatar { get; set; }
-    public string? playerId { get; set; }
+    public int playerId { get; set; }
     public string? Url { get; set; }
     public string? Name { get; set; }
     public string? Username { get; set; }

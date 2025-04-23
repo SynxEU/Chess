@@ -24,6 +24,7 @@ public static class Mapping
     public static ChessPlayerDTO ToDTO(this ChessPlayer model) => new()
     {
         ChessId = model.ChessId,
+        playerId = model.player_id,
         Avatar = model.avatar,
         Url = model.url,
         Name = model.name,
