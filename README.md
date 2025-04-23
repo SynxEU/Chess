@@ -23,7 +23,6 @@ Projektet er lavet i forbindelse med et skoleprojekt i Big Data og har fokus på
 - Lagring i relationel database med EF Core
 
 ### TO:DO
-To:Do er ting der kommer til projektet med tiden som web versionen lige så stille kommer frem:
 - Automatisk håndtering af dataopdatering (Hvis muligt)
 - Menu til at finde gammelt data på spiller
 - Selv at kunne indtaste spiller gennem konsolen
