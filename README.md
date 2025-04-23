@@ -42,19 +42,19 @@ Projektet er udviklet med følgende teknologier:
 Databasen inkluderer følgende entiteter: \
 \
 **Models:**
-- UserData:
+1. UserData:
    - ChessPlayer: indeholder generel information om brugeren.
-   - StreamingPlatform: information om hvorvidt brugeren streamer (f.eks. Twitch, YouTube). \
-- Modes:
-   - ChessBlitz, ChessRapid, ChessBullet, ChessDaily: hver mode indeholder f.eks. antal spil, rating, winstreaks osv. \
-- PlayerStats:
+   - StreamingPlatform: information om hvorvidt brugeren streamer (f.eks. Twitch, YouTube). 
+2. Modes:
+   - ChessBlitz, ChessRapid, ChessBullet, ChessDaily: hver mode indeholder f.eks. antal spil, rating, winstreaks osv. 
+3. PlayerStats:
    - Tactics: taktiske statistikker som puzzles løst, accuracy, m.m.
-   - Stats \
-- Records: toppræstationer inddelt i:
+   - Stats 
+4. Records: toppræstationer inddelt i:
    - Best
    - Last
-   - Record \
-- Scale:
+   - Record 
+5. Scale:
    - Highest, Lowest: bruges f.eks. til at vise højeste og laveste rating over tid.
 
 Databaseforbindelsen er sat op via `ChessDbContext` og benytter en LocalDB som standard.
