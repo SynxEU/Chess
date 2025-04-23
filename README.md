@@ -21,12 +21,12 @@ Projektet er lavet i forbindelse med et skoleprojekt i Big Data og har fokus på
 - Hent spillerprofiler (brugernavn, land, medlemsdato, osv.)
 - Hent statistikker (blitz/rapid/bullet ratings og antal spil)
 - Lagring i relationel database med EF Core
-- Automatisk håndtering af dataopdatering
 
 ### TO:DO
 To:Do er ting der kommer til projektet med tiden som web versionen lige så stille kommer frem:
-- Automatisk håndtering af dataopdatering
-- Dynamisk username gennem konsol applikation
+- Automatisk håndtering af dataopdatering (Hvis muligt)
+- Menu til at finde gammelt data på spiller
+- Selv at kunne indtaste spiller gennem konsolen
 
 ## Teknologier
 Projektet er udviklet med følgende teknologier:
