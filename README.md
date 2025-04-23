@@ -41,7 +41,7 @@ Projektet er udviklet med følgende teknologier:
 ### Entities
 Databasen inkluderer følgende entiteter: \
 \
-📂 Models \
+**📂 Models** \
 UserData:
 - ChessPlayer: indeholder generel information om brugeren.
 - StreamingPlatform: information om hvorvidt brugeren streamer (f.eks. Twitch, YouTube).
