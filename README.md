@@ -48,7 +48,7 @@ Databasen inkluderer følgende entiteter: \
 2. Modes:
    - ChessBlitz, ChessRapid, ChessBullet, ChessDaily: hver mode indeholder f.eks. antal spil, rating, wins osv. 
 3. PlayerStats:
-   - Tactics: taktiske statistikker som puzzles løst, accuracy, m.m.
+   - Tactics: Andet ord for lessons folk har lavet og deres nuværende rating
    - Stats 
 4. Records: toppræstationer inddelt i:
    - Best
