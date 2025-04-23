@@ -32,7 +32,7 @@ Projektet er udviklet med følgende teknologier:
 - C# / .NET 9
 - Entity Framework Core
 - SQL Server Management Studio (SSMS)
-- API (Chess.com)
+- API ([Chess.com](https://www.chess.com/news/view/published-data-api?ref=public_apis&utm_medium=website))
 - Newtonsoft.Json (JSON håndtering)
 
 ## Database
