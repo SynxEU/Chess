@@ -14,5 +14,6 @@ public class Stats
     public int fide { get; set; }
     public Tactics? tactics { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateOnly FetchedAtDate { get; set; }
+    public TimeSpan FetchedAtTime { get; set; }
 }

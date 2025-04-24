@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Internal;
 using Newtonsoft.Json;
 
 namespace ChessAPI.Models
@@ -27,7 +28,8 @@ namespace ChessAPI.Models
         public bool verified { get; set; }
         public string? league { get; set; }
         public List<StreamingPlatform>? streaming_platforms { get; set; }
-        public DateTime? FetchedAt { get; set; }
+        public DateOnly? FetchedAtDate { get; set; }
+        public TimeSpan? FetchedAtTime { get; set; }
 
         public List<Stats>? Stats { get; set; }
     }

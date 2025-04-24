@@ -52,7 +52,7 @@ public class ChessDbContext : DbContext
             .OwnsMany(p => p.streaming_platforms);
 
         modelBuilder.Entity<ChessPlayer>()
-            .HasIndex(p => new { p.username, p.FetchedAt })
+            .HasIndex(p => new { p.username, p.FetchedAtDate, p.FetchedAtTime })
             .IsUnique(false);
 
         modelBuilder.Entity<Stats>()
@@ -60,9 +60,17 @@ public class ChessDbContext : DbContext
             .WithMany(p => p.Stats)
             .HasForeignKey(s => s.ChessId);
         
+        modelBuilder.Entity<ChessPlayer>()
+            .HasIndex(p => new { p.ChessId, p.FetchedAtDate, p.FetchedAtTime })
+            .IsUnique(false);
+        
+        modelBuilder.Entity<ChessPlayer>()
+            .Property(e => e.FetchedAtTime)
+            .HasColumnType("time(0)");
+        
         modelBuilder.Entity<Stats>()
-            .Property(s => s.CreatedAt)
-            .HasDefaultValueSql("GETDATE()");
+            .Property(e => e.FetchedAtTime)
+            .HasColumnType("time(0)");
     }
 
 }

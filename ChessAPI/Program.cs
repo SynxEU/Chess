@@ -25,6 +25,7 @@ class Program
         // username = "dewa_kipas"; // Banned
         // username = "erik"; // Staff
         // username = "nox"; // Mod
+        username = "Mastervoliumpl"; // Jakub
         
         string basePlayerURL = "https://api.chess.com/pub/player/";
         string profileUrl = string.Empty;

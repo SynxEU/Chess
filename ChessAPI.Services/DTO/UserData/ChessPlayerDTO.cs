@@ -19,7 +19,8 @@ public class ChessPlayerDTO
     public bool IsStreamer { get; set; }
     public bool Verified { get; set; }
     public string? League { get; set; }
-    public DateTime? FetchedAt { get; set; }
+    public DateOnly? FetchedAtDate { get; set; }
+    public TimeSpan? FetchedAtTime { get; set; }
     public List<StreamingPlatformDTO> StreamingPlatforms { get; set; }
     public List<PlayerStatsDTO> Stats { get; set; }
 }

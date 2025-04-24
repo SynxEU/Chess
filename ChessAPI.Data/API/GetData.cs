@@ -29,13 +29,15 @@ public class GetData
 
         if (stats != null)
         {
-            stats.CreatedAt = DateTime.UtcNow;
+            stats.FetchedAtDate = DateOnly.FromDateTime(DateTime.UtcNow);
+            stats.FetchedAtTime = TimeOnly.FromDateTime(DateTime.UtcNow).ToTimeSpan();
             stats.ChessId = player.ChessId;
             
             // Needs to be reworked, not checking how i wanted
             bool alreadyExists = context.Stats
                 .Any(s => s.ChessId == player.ChessId
-                          && s.CreatedAt == stats.CreatedAt);
+                          && s.FetchedAtTime == stats.FetchedAtTime
+                          && s.FetchedAtDate == stats.FetchedAtDate);
 
             if (!alreadyExists)
             {
@@ -44,7 +46,7 @@ public class GetData
             }
             else
             {
-                Console.WriteLine($"Stats already exist for {player.username} at {stats.CreatedAt} — skipping save.");
+                Console.WriteLine($"Stats already exist for {player.username} on {stats.FetchedAtDate} at {stats.FetchedAtTime} — skipping save.");
             }
         }
 
@@ -69,12 +71,14 @@ public class GetData
 
         if (player != null)
         {
-            player.FetchedAt = DateTime.UtcNow;
+            player.FetchedAtDate = DateOnly.FromDateTime(DateTime.UtcNow);
+            player.FetchedAtTime = TimeOnly.FromDateTime(DateTime.UtcNow).ToTimeSpan();
 
             // Needs to be reworked, not checking how i wanted
             bool alreadyExists = context.ChessPlayers
                 .Any(p => p.username == player.username 
-                          && p.FetchedAt == player.FetchedAt);
+                          && p.FetchedAtDate == player.FetchedAtDate
+                          && p.FetchedAtTime == player.FetchedAtTime);
 
             if (!alreadyExists)
                 
@@ -84,7 +88,7 @@ public class GetData
             }
             else
             {
-                Console.WriteLine($"Data already exists for {player.username} at {player.FetchedAt} — skipping save.");
+                Console.WriteLine($"Data already exists for {player.username} at {player.FetchedAtDate} at {player.FetchedAtTime} — skipping save.");
             }
         }
 

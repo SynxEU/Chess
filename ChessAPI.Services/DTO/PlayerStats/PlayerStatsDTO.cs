@@ -10,4 +10,6 @@ public class PlayerStatsDTO
     public ChessBlitzDTO ChessBlitz { get; set; }
     public int Fide { get; set; }
     public TacticsDTO Tactics { get; set; }
+    public DateOnly FetchedAtDate { get; set; }
+    public TimeSpan FetchedAtTime { get; set; }
 }

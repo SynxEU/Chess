@@ -38,7 +38,8 @@ public static class Mapping
         IsStreamer = model.is_streamer,
         Verified = model.verified,
         League = model.league,
-        FetchedAt = model.FetchedAt,
+        FetchedAtDate = model.FetchedAtDate,
+        FetchedAtTime = model.FetchedAtTime, 
         StreamingPlatforms = model.streaming_platforms?
             .Select(p => p.ToDTO())
             .ToList(),
@@ -63,7 +64,8 @@ public static class Mapping
         is_streamer = dto.IsStreamer,
         verified = dto.Verified,
         league = dto.League,
-        FetchedAt = dto.FetchedAt,
+        FetchedAtDate = dto.FetchedAtDate,
+        FetchedAtTime = dto.FetchedAtTime,
         streaming_platforms = dto.StreamingPlatforms?
             .Select(p => p.ToModel())
             .ToList(),
@@ -159,6 +161,8 @@ public static class Mapping
         ChessBlitz = model.chess_blitz?.ToDTO(),
         ChessDaily = model.chess_daily?.ToDTO(),
         Tactics = model.tactics?.ToDTO(),
+        FetchedAtDate = model.FetchedAtDate,
+        FetchedAtTime = model.FetchedAtTime
     };
 
     public static Stats ToModel(this PlayerStatsDTO dto) => new()
@@ -168,6 +172,8 @@ public static class Mapping
         chess_blitz = dto.ChessBlitz?.ToModel(),
         chess_daily = dto.ChessDaily?.ToModel(),
         tactics = dto.Tactics?.ToModel(),
+        FetchedAtDate = dto.FetchedAtDate,
+        FetchedAtTime = dto.FetchedAtTime
     };
 
     public static ChessRapidDTO ToDTO(this ChessRapid model) => new()
