@@ -21,4 +21,6 @@ public class Stats
     public TimeSpan FetchedAtTime { get; set; }
     
     public int Weight { get; set; }
+    public DateOnly UpdatedAtDate { get; set; }
+    public TimeSpan UpdatedAtTime { get; set; }
 }

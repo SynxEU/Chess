@@ -15,7 +15,7 @@ public class DataMongo
     private static readonly IMongoCollection<BsonDocument> _statsCollection = _mongoDatabase.GetCollection<BsonDocument>("Stats");
     private static readonly IMongoCollection<BsonDocument> _playersCollection = _mongoDatabase.GetCollection<BsonDocument>("Players");
     
-    public static async Task InsertRawDataIntoMongoDB(string url)
+    public static async Task InsertRawDataIntoMongoDB(string url, string username)
     {
         BsonDocument fetchedPlayer = await GetData.GetPlayer(url);
         if (fetchedPlayer != null)
@@ -24,7 +24,7 @@ public class DataMongo
             Console.WriteLine("Inserted raw player data");
         }
 
-        BsonDocument stats = await GetData.GetStats(string.Concat(url + "/stats"));
+        BsonDocument stats = await GetData.GetStats(string.Concat(url + "/stats"), username);
         if (stats != null)
         {
             await _statsCollection.InsertOneAsync(stats); 
@@ -33,35 +33,36 @@ public class DataMongo
     }
 
     
-    public static async Task<List<BsonDocument>> GetRawStatsFromMongoDB()
+    public static async Task<List<BsonDocument>> GetRawStatsFromMongoDB(string selectedUsername)
     {
-        var sortDefinition = Builders<BsonDocument>.Sort
-            .Descending("CreatedAt");
+        var filter = Builders<BsonDocument>.Filter.Eq("username", selectedUsername);
+        var sort = Builders<BsonDocument>.Sort.Descending("createdAt");
 
-        return await _statsCollection.Find(FilterDefinition<BsonDocument>.Empty)
-            .Sort(sortDefinition)
-            .Limit(1) // Change to more than 1 if you want more recent entries
-            .ToListAsync();
-    }
-
-    public static async Task<List<BsonDocument>> GetRawPlayersFromMongoDB()
-    {
-        var sortDefinition = Builders<BsonDocument>.Sort
-            .Descending("CreatedAt");
-
-        return await _playersCollection.Find(FilterDefinition<BsonDocument>.Empty)
-            .Sort(sortDefinition)
+        return await _statsCollection.Find(filter)
+            .Sort(sort)
             .Limit(1)
             .ToListAsync();
     }
 
+    public static async Task<List<BsonDocument>> GetRawPlayersFromMongoDB(string selectedUsername)
+    {
+        var filter = Builders<BsonDocument>.Filter.Eq("username", selectedUsername);
+        var sort = Builders<BsonDocument>.Sort.Descending("createdAt");
+
+        return await _playersCollection.Find(filter)
+            .Sort(sort)
+            .Limit(1)
+            .ToListAsync();
+    }
+
+
     
     
-    public static async Task<List<Stats>> GetStatsFromMongo()
+    public static async Task<List<Stats>> GetStatsFromMongo(string selectedUsername)
     {
         IgnoreExtraFields.RegisterClassMaps();
         
-        List<BsonDocument> rawStatsFromMongo = await GetRawStatsFromMongoDB();
+        List<BsonDocument> rawStatsFromMongo = await GetRawStatsFromMongoDB(selectedUsername);
 
         List<Stats> statsFromMongo = rawStatsFromMongo
             .Select(doc => MongoDeserialize.DeserializeStats(doc)) // Deserialize BsonDocument to Stats
@@ -70,11 +71,11 @@ public class DataMongo
         return statsFromMongo;
     }
 
-    public static async Task<List<ChessPlayer>> GetPlayersFromMongo()
+    public static async Task<List<ChessPlayer>> GetPlayersFromMongo(string selectedUsername)
     {
         IgnoreExtraFields.RegisterClassMaps();
         
-        List<BsonDocument> rawPlayersFromMongo = await GetRawPlayersFromMongoDB();
+        List<BsonDocument> rawPlayersFromMongo = await GetRawPlayersFromMongoDB(selectedUsername);
 
         List<ChessPlayer> playersFromMongo = rawPlayersFromMongo
             .Select(doc => MongoDeserialize.DeserializeChessPlayer(doc)) // Deserialize BsonDocument to ChessPlayer

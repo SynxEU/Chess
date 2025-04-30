@@ -31,7 +31,7 @@ public class GetData
     }
 
 
-    public static async Task<BsonDocument> GetStats(string url)
+    public static async Task<BsonDocument> GetStats(string url, string username)
     {
         using HttpClient client = new HttpClient();
         client.DefaultRequestHeaders.UserAgent.ParseAdd("CSharpApp/1.0");
@@ -48,6 +48,7 @@ public class GetData
         var stats = BsonDocument.Parse(statsJson);
     
         stats.Add("createdAt", BsonValue.Create(DateTime.UtcNow)); // Add createdAt timestamp
+        stats.Add("username", username);
 
         return stats;
     }

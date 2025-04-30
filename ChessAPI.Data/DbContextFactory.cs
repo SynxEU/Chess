@@ -8,7 +8,6 @@ public class DbContextFactory : IDesignTimeDbContextFactory<ChessDbContext>
     {
         var envPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "config.env");
         var fullPath = Path.GetFullPath(envPath);
-        Console.WriteLine($"Loading .env from: {fullPath}");
         Env.Load(fullPath);
         
         var optionsBuilder = new DbContextOptionsBuilder<ChessDbContext>();

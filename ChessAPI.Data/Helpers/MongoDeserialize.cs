@@ -36,8 +36,8 @@ public class MongoDeserialize
             FetchedAtTime = doc.Contains("CreatedAt")
                 ? doc["CreatedAt"].ToUniversalTime().TimeOfDay
                 : DateTime.Now.TimeOfDay,
-            UpdatedAtDate = DateOnly.FromDateTime(DateTime.Now.Date),
-            UpdatedAtTime = DateTime.Now.TimeOfDay,
+            UpdatedAtDate = DateOnly.FromDateTime(DateTime.MinValue.Date),
+            UpdatedAtTime = TimeSpan.Zero,
             Weight = doc.Contains("Weight") ? doc["Weight"].AsInt32 : 0
         };
 
@@ -49,10 +49,6 @@ public class MongoDeserialize
         // Assuming MongoDB "id" is mapped as the logical identifier.
         Stats stats = new Stats
         {
-            id = doc.Contains("id") ? doc["id"].AsInt32 : 0, // Manually assigning 'id' if it exists
-            ChessId = doc.Contains("ChessId")
-                ? doc["ChessId"].AsInt32
-                : 0, // Manually assign ChessId (you may have another source to assign this)
             fide = doc["fide"].AsInt32,
             Weight = doc.Contains("weight") ? doc["Weight"].AsInt32 : 0,
             FetchedAtDate = doc.Contains("CreatedAt") 
@@ -60,20 +56,10 @@ public class MongoDeserialize
                 : DateOnly.FromDateTime(DateTime.UtcNow),
             FetchedAtTime = doc.Contains("CreatedAt")
                 ? doc["CreatedAt"].ToUniversalTime().TimeOfDay
-                : DateTime.Now.TimeOfDay
+                : DateTime.Now.TimeOfDay,
+            UpdatedAtDate = DateOnly.FromDateTime(DateTime.MinValue.Date),
+            UpdatedAtTime = TimeSpan.Zero
         };
-
-        // Deserialize ChessPlayer (if embedded in Stats document)
-        if (doc.Contains("ChessPlayer") && doc["ChessPlayer"].BsonType == BsonType.Document)
-        {
-            var chessPlayerDoc = doc["ChessPlayer"].AsBsonDocument;
-            var chessPlayer = DeserializeChessPlayer(chessPlayerDoc);
-
-            // Make sure the ChessId is linked from Stats to ChessPlayer
-            chessPlayer.ChessId = stats.ChessId;
-
-            stats.ChessPlayer = chessPlayer;
-        }
 
         // Deserialize additional fields if necessary
         stats.chess_daily = doc.Contains("chess_daily")
@@ -89,7 +75,6 @@ public class MongoDeserialize
             ? BsonSerializer.Deserialize<ChessBlitz>(doc["chess_blitz"].AsBsonDocument)
             : null;
         stats.tactics = doc.Contains("tactics")
-
             ? BsonSerializer.Deserialize<Tactics>(doc["tactics"].AsBsonDocument)
             : null;
 

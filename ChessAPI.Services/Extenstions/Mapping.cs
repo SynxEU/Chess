@@ -153,6 +153,7 @@ public static class Mapping
     public static PlayerStatsDTO ToDTO(this Stats model) => new()
     {
         ChessId = model.ChessId,
+        Fide = model.fide,
         ChessRapid = model.chess_rapid?.ToDTO(),
         ChessBullet = model.chess_bullet?.ToDTO(),
         ChessBlitz = model.chess_blitz?.ToDTO(),
@@ -165,6 +166,7 @@ public static class Mapping
     public static Stats ToModel(this PlayerStatsDTO dto) => new()
     {
         ChessId = dto.ChessId,
+        fide = dto.Fide,
         chess_rapid = dto.ChessRapid?.ToModel(),
         chess_bullet = dto.ChessBullet?.ToModel(),
         chess_blitz = dto.ChessBlitz?.ToModel(),

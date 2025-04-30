@@ -1,14 +1,15 @@
+using System.Data.Entity;
 using ChessAPI.DataCollect.Helpers;
 using ChessAPI.Models;
 using MongoDB.Bson;
 
 namespace ChessAPI.DataCollect.API;
 
-public class ProcessData
+public static class ProcessData
 {
-    public static async Task<ChessPlayer> ProcessAndSaveFilteredPlayerData(ChessDbContext context)
+    public static async Task<ChessPlayer> ProcessAndSaveFilteredPlayerData(ChessDbContext context, string selectedUsername)
     {
-        List<ChessPlayer> playersFromMongo = await DataMongo.GetPlayersFromMongo();
+        List<ChessPlayer> playersFromMongo = await DataMongo.GetPlayersFromMongo(selectedUsername);
 
         // Process and filter player data first
         foreach (ChessPlayer player in playersFromMongo)
@@ -37,6 +38,10 @@ public class ProcessData
                                                     player.streaming_platforms.Any(newPlatform =>
                                                         newPlatform.channel_url == existingPlatform.channel_url));
 
+                existingPlayer.Weight += 1;
+                existingPlayer.UpdatedAtDate = DateOnly.FromDateTime(DateTime.UtcNow);
+                existingPlayer.UpdatedAtTime = TimeOnly.FromDateTime(DateTime.UtcNow).ToTimeSpan();
+                
                 if (hasSameStreamingPlatform)
                 {
                     foreach (StreamingPlatform newPlatform in player.streaming_platforms)
@@ -50,19 +55,11 @@ public class ProcessData
                         }
                     }
 
-                    existingPlayer.Weight += 1;
-                    existingPlayer.UpdatedAtDate = DateOnly.FromDateTime(DateTime.UtcNow);
-                    existingPlayer.UpdatedAtTime = TimeOnly.FromDateTime(DateTime.UtcNow).ToTimeSpan();
-
                     await context.SaveChangesAsync();
                     Console.WriteLine($"Updated weight for {player.username} with streaming platform.");
                 }
                 else
                 {
-                    existingPlayer.Weight += 1;
-                    existingPlayer.UpdatedAtDate = DateOnly.FromDateTime(DateTime.UtcNow);
-                    existingPlayer.UpdatedAtTime = TimeOnly.FromDateTime(DateTime.UtcNow).ToTimeSpan();
-
                     await context.SaveChangesAsync();
                     Console.WriteLine($"Updated weight for {player.username} without streaming platform.");
                 }
@@ -74,15 +71,42 @@ public class ProcessData
                 Console.WriteLine($"Added new player: {player.username}");
             }
         }
-        return playersFromMongo.FirstOrDefault();
+        
+        var newestCreated = context.ChessPlayers
+            .AsQueryable()
+            .Where(p => p.UpdatedAtDate == DateOnly.MinValue && p.UpdatedAtTime == TimeSpan.Zero)
+            .OrderByDescending(p => p.FetchedAtDate)
+            .ThenByDescending(p => p.FetchedAtTime)
+            .FirstOrDefault();
+
+        if (newestCreated != null)
+            return newestCreated;
+
+        var newestUpdated = context.ChessPlayers
+            .AsQueryable()
+            .Where(p => p.UpdatedAtDate != DateOnly.MinValue || p.UpdatedAtTime != TimeSpan.Zero)
+            .OrderByDescending(p => p.UpdatedAtDate)
+            .ThenByDescending(p => p.UpdatedAtTime)
+            .FirstOrDefault();
+
+        return newestUpdated;
+
     }
 
-    public static async Task<Stats> ProcessAndSaveFilteredStatsData(ChessDbContext context)
+    public static async Task<Stats> ProcessAndSaveFilteredStatsData(ChessDbContext context, string selectedUsername)
     {
-        List<Stats> statsFromMongo = await DataMongo.GetStatsFromMongo();
+        List<Stats> statsFromMongo = await DataMongo.GetStatsFromMongo(selectedUsername);
 
         foreach (var stat in statsFromMongo)
         {
+            stat.ChessId = context.ChessPlayers
+                .AsQueryable()
+                .OrderByDescending(cp => cp.FetchedAtDate)
+                .ThenByDescending(cp => cp.FetchedAtTime)
+                .Select(cp => cp.ChessId)
+                .FirstOrDefault();
+            
+            
             var existingPlayer = context.ChessPlayers.FirstOrDefault(p => p.ChessId == stat.ChessId);
             if (existingPlayer == null)
             {
@@ -106,11 +130,29 @@ public class ProcessData
             else
             {
                 alreadyExists.Weight += 1;
+                alreadyExists.UpdatedAtDate = DateOnly.FromDateTime(DateTime.UtcNow);
+                alreadyExists.UpdatedAtTime = TimeOnly.FromDateTime(DateTime.UtcNow).ToTimeSpan();
                 await context.SaveChangesAsync();
                 Console.WriteLine($"Updated weight for ChessId: {stat.ChessId}");
             }
         }
 
-        return statsFromMongo.FirstOrDefault();
+        var newestCreated = context.Stats
+            .AsQueryable()
+            .Where(p => p.UpdatedAtDate == DateOnly.MinValue && p.UpdatedAtTime == TimeSpan.Zero)
+            .OrderByDescending(p => p.FetchedAtDate)
+            .ThenByDescending(p => p.FetchedAtTime)
+            .FirstOrDefault();
+
+        if (newestCreated != null)
+            return newestCreated;
+
+        var newestUpdated = context.Stats
+            .Where(p => p.UpdatedAtDate != DateOnly.MinValue || p.UpdatedAtTime != TimeSpan.Zero)
+            .OrderByDescending(p => p.UpdatedAtDate)
+            .ThenByDescending(p => p.UpdatedAtTime)
+            .FirstOrDefault();
+
+        return newestUpdated;
     }
 }
