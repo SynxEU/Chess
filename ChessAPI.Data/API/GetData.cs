@@ -23,10 +23,13 @@ public class GetData
         }
 
         string profileJson = await profileResponse.Content.ReadAsStringAsync();
-        var player = BsonDocument.Parse(profileJson); // Parse as BsonDocument
+        var player = BsonDocument.Parse(profileJson);
+    
+        player.Add("createdAt", BsonValue.Create(DateTime.UtcNow));
 
         return player;
     }
+
 
     public static async Task<BsonDocument> GetStats(string url)
     {
@@ -42,8 +45,11 @@ public class GetData
         }
 
         string statsJson = await statsResponse.Content.ReadAsStringAsync();
-        var stats = BsonDocument.Parse(statsJson); // Parse as BsonDocument
+        var stats = BsonDocument.Parse(statsJson);
+    
+        stats.Add("createdAt", BsonValue.Create(DateTime.UtcNow)); // Add createdAt timestamp
 
         return stats;
     }
+
 }

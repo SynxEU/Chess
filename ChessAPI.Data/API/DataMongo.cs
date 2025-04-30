@@ -35,20 +35,33 @@ public class DataMongo
     
     public static async Task<List<BsonDocument>> GetRawStatsFromMongoDB()
     {
-        return await _statsCollection.Find(FilterDefinition<BsonDocument>.Empty).ToListAsync();
+        var sortDefinition = Builders<BsonDocument>.Sort
+            .Descending("CreatedAt");
+
+        return await _statsCollection.Find(FilterDefinition<BsonDocument>.Empty)
+            .Sort(sortDefinition)
+            .Limit(1) // Change to more than 1 if you want more recent entries
+            .ToListAsync();
     }
 
     public static async Task<List<BsonDocument>> GetRawPlayersFromMongoDB()
     {
-        return await _playersCollection.Find(FilterDefinition<BsonDocument>.Empty).ToListAsync();
+        var sortDefinition = Builders<BsonDocument>.Sort
+            .Descending("CreatedAt");
+
+        return await _playersCollection.Find(FilterDefinition<BsonDocument>.Empty)
+            .Sort(sortDefinition)
+            .Limit(1)
+            .ToListAsync();
     }
+
     
     
     public static async Task<List<Stats>> GetStatsFromMongo()
     {
         IgnoreExtraFields.RegisterClassMaps();
         
-        List<BsonDocument> rawStatsFromMongo = await DataMongo.GetRawStatsFromMongoDB();
+        List<BsonDocument> rawStatsFromMongo = await GetRawStatsFromMongoDB();
 
         List<Stats> statsFromMongo = rawStatsFromMongo
             .Select(doc => MongoDeserialize.DeserializeStats(doc)) // Deserialize BsonDocument to Stats
@@ -61,7 +74,7 @@ public class DataMongo
     {
         IgnoreExtraFields.RegisterClassMaps();
         
-        List<BsonDocument> rawPlayersFromMongo = await DataMongo.GetRawPlayersFromMongoDB();
+        List<BsonDocument> rawPlayersFromMongo = await GetRawPlayersFromMongoDB();
 
         List<ChessPlayer> playersFromMongo = rawPlayersFromMongo
             .Select(doc => MongoDeserialize.DeserializeChessPlayer(doc)) // Deserialize BsonDocument to ChessPlayer

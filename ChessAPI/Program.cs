@@ -49,9 +49,10 @@ class Program
         // Use "de-DE" for dot (1.234), or "fr-FR" for space (1 234)
         CultureInfo format = new CultureInfo("de-DE");
 
-        await ProcessData.ProcessAndSaveFilteredData(context);
+        ChessPlayerDTO player = (await ProcessData.ProcessAndSaveFilteredPlayerData(context)).ToDTO();
+        PlayerStatsDTO stats = (await ProcessData.ProcessAndSaveFilteredStatsData(context)).ToDTO();
 
-        Display(new(), new(), format);
+        Display(player, stats, format);
 
     }
 

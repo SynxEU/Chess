@@ -6,13 +6,12 @@ namespace ChessAPI.DataCollect.API;
 
 public class ProcessData
 {
-    public static async Task ProcessAndSaveFilteredData(ChessDbContext context)
+    public static async Task<ChessPlayer> ProcessAndSaveFilteredPlayerData(ChessDbContext context)
     {
-        List<Stats> statsFromMongo = await DataMongo.GetStatsFromMongo();
         List<ChessPlayer> playersFromMongo = await DataMongo.GetPlayersFromMongo();
 
         // Process and filter player data first
-        foreach (var player in playersFromMongo)
+        foreach (ChessPlayer player in playersFromMongo)
         {
             var existingPlayer = context.ChessPlayers
                 .FirstOrDefault(p =>
@@ -40,9 +39,9 @@ public class ProcessData
 
                 if (hasSameStreamingPlatform)
                 {
-                    foreach (var newPlatform in player.streaming_platforms)
+                    foreach (StreamingPlatform newPlatform in player.streaming_platforms)
                     {
-                        var existingPlatform = existingPlayer.streaming_platforms
+                        StreamingPlatform existingPlatform = existingPlayer.streaming_platforms
                             .FirstOrDefault(p => p.channel_url == newPlatform.channel_url);
 
                         if (existingPlatform != null)
@@ -75,8 +74,13 @@ public class ProcessData
                 Console.WriteLine($"Added new player: {player.username}");
             }
         }
+        return playersFromMongo.FirstOrDefault();
+    }
 
-        // Process stats after players are processed
+    public static async Task<Stats> ProcessAndSaveFilteredStatsData(ChessDbContext context)
+    {
+        List<Stats> statsFromMongo = await DataMongo.GetStatsFromMongo();
+
         foreach (var stat in statsFromMongo)
         {
             var existingPlayer = context.ChessPlayers.FirstOrDefault(p => p.ChessId == stat.ChessId);
@@ -90,7 +94,7 @@ public class ProcessData
                 .Where(s => s.ChessId == stat.ChessId)
                 .ToList();
 
-            var alreadyExists =
+            Stats? alreadyExists =
                 statList.FirstOrDefault(ae => ae.fide == stat.fide && Compare.CompareGameModes(ae, stat));
 
             if (alreadyExists == null)
@@ -106,5 +110,7 @@ public class ProcessData
                 Console.WriteLine($"Updated weight for ChessId: {stat.ChessId}");
             }
         }
+
+        return statsFromMongo.FirstOrDefault();
     }
 }
