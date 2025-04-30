@@ -68,6 +68,10 @@ public class ChessDbContext : DbContext
             .Property(e => e.FetchedAtTime)
             .HasColumnType("time(0)");
         
+        modelBuilder.Entity<ChessPlayer>()
+            .Property(e => e.UpdatedAtTime)
+            .HasColumnType("time(0)");
+        
         modelBuilder.Entity<Stats>()
             .Property(e => e.FetchedAtTime)
             .HasColumnType("time(0)");

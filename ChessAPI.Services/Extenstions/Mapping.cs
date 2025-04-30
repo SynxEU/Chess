@@ -79,8 +79,6 @@ public static class Mapping
         Rating = model.rating,
         Date = model.date,
         Game = model.game,
-        TotalAttempts = model.total_attempts,
-        Score = model.score
     };
 
     public static Best ToModel(this BestDTO dto) => new()
@@ -88,8 +86,6 @@ public static class Mapping
         rating = dto.Rating,
         date = dto.Date,
         game = dto.Game,
-        total_attempts = dto.TotalAttempts,
-        score = dto.Score
     };
 
     public static LastDTO ToDTO(this Last model) => new()
@@ -156,6 +152,7 @@ public static class Mapping
 
     public static PlayerStatsDTO ToDTO(this Stats model) => new()
     {
+        ChessId = model.ChessId,
         ChessRapid = model.chess_rapid?.ToDTO(),
         ChessBullet = model.chess_bullet?.ToDTO(),
         ChessBlitz = model.chess_blitz?.ToDTO(),
@@ -167,6 +164,7 @@ public static class Mapping
 
     public static Stats ToModel(this PlayerStatsDTO dto) => new()
     {
+        ChessId = dto.ChessId,
         chess_rapid = dto.ChessRapid?.ToModel(),
         chess_bullet = dto.ChessBullet?.ToModel(),
         chess_blitz = dto.ChessBlitz?.ToModel(),

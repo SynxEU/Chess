@@ -4,6 +4,7 @@ namespace ChessAPI.Services.DTO.PlayerStats;
 
 public class PlayerStatsDTO
 {
+    public int ChessId { get; set; }
     public ChessDailyDTO ChessDaily { get; set; }
     public ChessRapidDTO ChessRapid { get; set; }
     public ChessBulletDTO ChessBullet { get; set; }

@@ -5,6 +5,7 @@ using ChessAPI.Services.DTO.PlayerStats;
 using ChessAPI.Services.DTO.UserData;
 using ChessAPI.Services.Extenstions;
 using Spectre.Console;
+using Timer = System.Timers.Timer;
 
 class Program
 {
@@ -12,25 +13,25 @@ class Program
     {
         var factory = new DbContextFactory();
         var context = factory.CreateDbContext(args);
-        
+
         string? username = string.Empty;
-        
+
         // Username will become dynamic next major update
         // These will be seated data to make a select menu
-        
+
         // username = "magnuscarlsen"; // Premium + no streamer
-        // username = "hikaru"; // Streamer + Premium
+        username = "hikaru"; // Streamer + Premium
         // username = "gothamchess"; // Streamer
         // username = "synx_eu"; // Basic
         // username = "dewa_kipas"; // Banned
         // username = "erik"; // Staff
         // username = "nox"; // Mod
-        username = "Mastervoliumpl"; // Jakub
-        
+        // username = "Mastervoliumpl"; // Jakub
+
         string basePlayerURL = "https://api.chess.com/pub/player/";
         string profileUrl = string.Empty;
-        
-        if (!string.IsNullOrEmpty(username) 
+
+        if (!string.IsNullOrEmpty(username)
             || !string.IsNullOrWhiteSpace(username))
         {
             profileUrl = basePlayerURL + username.ToLower();
@@ -43,12 +44,19 @@ class Program
             return;
         }
         
+        await DataMongo.InsertRawDataIntoMongoDB(profileUrl);
+        
         // Use "de-DE" for dot (1.234), or "fr-FR" for space (1 234)
-        CultureInfo format = new CultureInfo("de-DE"); 
-        
-        ChessPlayerDTO? player = (await GetData.GetPlayer(profileUrl, context)).ToDTO();
-        PlayerStatsDTO? stats = (await GetData.GetStats(string.Concat(profileUrl, "/stats"), context, player.ToModel())).ToDTO();
-        
+        CultureInfo format = new CultureInfo("de-DE");
+
+        await ProcessData.ProcessAndSaveFilteredData(context);
+
+        Display(new(), new(), format);
+
+    }
+
+    private static void Display(ChessPlayerDTO? player, PlayerStatsDTO stats, CultureInfo? format)
+    {
         AnsiConsole.Write(new Panel(
                 new Markup(
                     $"[bold yellow]Player Profile[/]\n\n" +
@@ -60,14 +68,14 @@ class Program
                     $"[bold]FIDE Rating:[/] {stats?.Fide.ToString("N0", format) ?? "N/A"}\n" +
                     $"[bold]Status:[/] " +
                     $"{(
-                        player?.Status == "closed:fair_play_violations" ? "[red bold]BANNED[/]" 
-                        : player?.Status == "closed" ? "[red bold]CLOSED[/]" 
-                        : player?.Status == "mod" ? "[#005faf bold]MODERATOR[/]" 
-                        : player?.Status == "staff" ? "[green bold]STAFF[/]" 
-                        : player?.Status == "premium" ? "[#00ffff bold]PREMIUM[/]" 
-                        : player?.Status == "basic" ? "[#4e7837 bold]BASIC[/]" 
+                        player?.Status == "closed:fair_play_violations" ? "[red bold]BANNED[/]"
+                        : player?.Status == "closed" ? "[red bold]CLOSED[/]"
+                        : player?.Status == "mod" ? "[#005faf bold]MODERATOR[/]"
+                        : player?.Status == "staff" ? "[green bold]STAFF[/]"
+                        : player?.Status == "premium" ? "[#00ffff bold]PREMIUM[/]"
+                        : player?.Status == "basic" ? "[#4e7837 bold]BASIC[/]"
                         : player?.Status ?? "N/A"
-                        )}\n" +
+                    )}\n" +
                     $"[bold]Followers:[/] {player?.Followers.ToString("N0", format) ?? "N/A"}\n" +
                     $"[bold]Location:[/] {player?.Location ?? "N/A"}\n" +
                     $"[bold]Last Online:[/] {(player?.LastOnline != null ? UnixToDate(player.LastOnline) : "N/A")}\n" +
@@ -80,8 +88,8 @@ class Program
 
 
 
-        
-        if (player is 
+
+        if (player is
             { IsStreamer: true })
         {
             Table streamTable = new Table()
@@ -97,7 +105,7 @@ class Program
 
             AnsiConsole.Write(streamTable);
         }
-        
+
         void WriteCombinedStats(string title, PlayerStatsDTO modeStats)
         {
             Table table = new Table()
@@ -129,7 +137,7 @@ class Program
                     .Record?.Loss
                     .ToString("N0", format) ?? "N/A"
             );
-            
+
             table.AddRow(
                 "[bold]Blitz[/]",
                 modeStats.ChessBlitz?
@@ -186,10 +194,10 @@ class Program
                     .Record?.Loss
                     .ToString("N0", format) ?? "N/A"
             );
-            
+
             AnsiConsole.Write(table);
         }
-        
+
         if (stats != null)
             WriteCombinedStats("Stats Overview", stats);
 
@@ -211,17 +219,20 @@ class Program
                     .Lowest?.Rating
                     .ToString("N0", format) ?? "N/A",
                 stats.Tactics?
-                    .Highest?.Date != null ? UnixToDate(stats.Tactics.Highest.Date) : "N/A",
+                    .Highest?.Date != null
+                    ? UnixToDate(stats.Tactics.Highest.Date)
+                    : "N/A",
                 stats.Tactics?
-                    .Lowest?.Date != null ? UnixToDate(stats.Tactics.Lowest.Date) : "N/A"
+                    .Lowest?.Date != null
+                    ? UnixToDate(stats.Tactics.Lowest.Date)
+                    : "N/A"
             );
-            
+
             AnsiConsole.Write(tacticsTable);
         }
-
     }
 
-    static string UnixToDate(long unixTime) 
+    static string UnixToDate(long unixTime)
         => DateTimeOffset.FromUnixTimeSeconds(unixTime)
             .ToLocalTime()
             .Date.ToShortDateString();

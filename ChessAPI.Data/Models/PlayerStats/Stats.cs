@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ChessAPI.Models;
 
 public class Stats
 {
+    [Key]
     public int id { get; set; }
         
     public int ChessId { get; set; }
@@ -16,4 +19,6 @@ public class Stats
 
     public DateOnly FetchedAtDate { get; set; }
     public TimeSpan FetchedAtTime { get; set; }
+    
+    public int Weight { get; set; }
 }
