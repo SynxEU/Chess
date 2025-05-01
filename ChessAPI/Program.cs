@@ -1,10 +1,17 @@
-﻿using ChessAPI.Models;
+﻿using System.Diagnostics;
+using System.Drawing;
+using ChessAPI.Models;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using ChessAPI.DataCollect.API;
 using ChessAPI.Services.DTO.PlayerStats;
 using ChessAPI.Services.DTO.UserData;
 using ChessAPI.Services.Extenstions;
+using ChessAPI.Services.Helper;
+using ChessAPI.Services.Services;
+using ScottPlot;
 using Spectre.Console;
+using Color = ScottPlot.Color;
 using Timer = System.Timers.Timer;
 
 class Program
@@ -31,6 +38,7 @@ class Program
                 .AddChoices(new[]
                 {
                     "Player Search",
+                    "Historical stats",
                     "[red]Exit[/]"
                 }));
 
@@ -38,6 +46,8 @@ class Program
         {
             case "Player Search":
                 return await PlayerSearch(context);
+            case "Historical stats":
+                return await ChoosePlayer(context);
             case "[red]Exit[/]":
                 AnsiConsole.MarkupLine("[yellow]Exiting...[/]");
                 return false;
@@ -90,6 +100,79 @@ class Program
         Console.ReadKey();
 
         return true;
+    }
+
+    private static async Task<bool> ChoosePlayer(ChessDbContext context)
+    {
+        AnsiConsole.Clear();
+
+        List<ChessPlayerDTO> players = await GetHistoricalData.GetLatestPlayersAsync(context);
+        int pageSize = 5;
+        int totalPages = (int)Math.Ceiling((double)players.Count / pageSize);
+        int currentPage = 0;
+
+        while (true)
+        {
+            List<ChessPlayerDTO> paginatedPlayers = players.Skip(currentPage * pageSize).Take(pageSize).ToList();
+        
+            List<string> playerChoices = paginatedPlayers.Select(p => FormatPlayerChoice(p)).ToList();
+        
+            playerChoices.Add("[green]Next Page[/]");
+            playerChoices.Add("[yellow]Previous Page[/]");
+            playerChoices.Add("[red]Exit[/]");
+        
+            string choice = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title($"Select a player or select [bold][red]Exit[/][/] to exit. Page [green]{currentPage + 1}[/] of [yellow]{totalPages}[/].")
+                    .AddChoices(playerChoices)
+            );
+
+            if (choice.ToLower() == "[red]exit[/]") return false;
+            if (choice.ToLower() == "[green]next page[/]" && currentPage < totalPages - 1) { currentPage++; continue; }
+            if (choice.ToLower() == "[yellow]previous page[/]" && currentPage > 0) { currentPage--; continue; }
+
+            string rawChoice = StripFormatting(choice);
+
+            ChessPlayerDTO selectedPlayer = players.FirstOrDefault(p => p.Username == rawChoice);
+            if (selectedPlayer != null)
+            {
+                await ShowHistoricalStats(context, selectedPlayer);
+            }
+            else
+            {
+                AnsiConsole.MarkupLine($"No such player found: [red bold]{rawChoice}[/]");
+            }
+
+            AnsiConsole.MarkupLine("\n[grey]Press any key to return to the menu...[/]");
+            Console.ReadKey();
+            return true;
+        }
+    }
+    
+    private static async Task ShowHistoricalStats(ChessDbContext context, ChessPlayerDTO player)
+    {
+        List<PlayerStatsDTO> stats = await GetHistoricalData.GetHistoryStatsFromDB(context, player.ToModel());
+        var orderedStats = Graph.OrderStatsByDateAndTime(stats); 
+
+        DateTime[] xDates = Graph.GetXDates(orderedStats);
+        double[] dates = Graph.GetOADates(xDates);
+
+        double[] bullet = Graph.GetRatings(orderedStats, s => s.ChessBullet?.Last.Rating); 
+        double[] blitz = Graph.GetRatings(orderedStats, s => s.ChessBlitz?.Last.Rating); 
+        double[] rapid = Graph.GetRatings(orderedStats, s => s.ChessRapid?.Last.Rating); 
+        double[] daily = Graph.GetRatings(orderedStats, s => s.ChessDaily?.Last.Rating);
+        double[] fide = orderedStats.Select(s => (double)s.Fide).ToArray(); 
+
+        Graph.SaveIndividualPlot(dates, bullet, "Bullet", "#964B00");
+        Graph.SaveIndividualPlot(dates, blitz, "Blitz", "#F9B234");
+        Graph.SaveIndividualPlot(dates, rapid, "Rapid",  "#50C878");
+        Graph.SaveIndividualPlot(dates, daily, "Daily", "#FFDF22");
+        Graph.SaveIndividualPlot(dates, fide, "FIDE", "#00FFFF");
+
+        AnsiConsole.MarkupLine("\n[grey]Press any key to return to the menu...[/]");
+        Console.ReadKey();
+
+        await Menu(context);
     }
 
     private static void Display(ChessPlayerDTO? player, PlayerStatsDTO stats, CultureInfo? format)
@@ -273,4 +356,10 @@ class Program
         => DateTimeOffset.FromUnixTimeSeconds(unixTime)
             .ToLocalTime()
             .Date.ToShortDateString();
+    
+    private static string FormatPlayerChoice(ChessPlayerDTO player)
+        => $"[#90d14b] {player.Username[0].ToString().ToUpper()}{player.Username.Substring(1)} [/]";
+    
+    private static string StripFormatting(string input)
+        => Regex.Replace(input, @"\[[^\]]*\]", "").Trim().ToLower();
 }
