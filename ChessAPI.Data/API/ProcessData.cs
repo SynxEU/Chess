@@ -10,8 +10,7 @@ public static class ProcessData
     public static async Task<ChessPlayer> ProcessAndSaveFilteredPlayerData(ChessDbContext context, string selectedUsername)
     {
         List<ChessPlayer> playersFromMongo = await DataMongo.GetPlayersFromMongo(selectedUsername);
-
-        // Process and filter player data first
+        
         foreach (ChessPlayer player in playersFromMongo)
         {
             var existingPlayer = context.ChessPlayers
@@ -72,25 +71,23 @@ public static class ProcessData
             }
         }
         
-        var newestCreated = context.ChessPlayers
-            .AsQueryable()
-            .Where(p => p.UpdatedAtDate == DateOnly.MinValue && p.UpdatedAtTime == TimeSpan.Zero)
+        ChessPlayer? newestCreated = context.ChessPlayers
+            .Where(p => p.username == selectedUsername 
+                        && p.UpdatedAtDate == DateOnly.MinValue 
+                        && p.UpdatedAtTime == TimeSpan.Zero)
             .OrderByDescending(p => p.FetchedAtDate)
             .ThenByDescending(p => p.FetchedAtTime)
             .FirstOrDefault();
 
-        if (newestCreated != null)
-            return newestCreated;
-
-        var newestUpdated = context.ChessPlayers
-            .AsQueryable()
-            .Where(p => p.UpdatedAtDate != DateOnly.MinValue || p.UpdatedAtTime != TimeSpan.Zero)
+        ChessPlayer? newestUpdated = context.ChessPlayers
+            .Where(p => p.username == selectedUsername 
+                        && p.UpdatedAtDate > DateOnly.MinValue 
+                        && p.UpdatedAtTime > TimeSpan.Zero)
             .OrderByDescending(p => p.UpdatedAtDate)
             .ThenByDescending(p => p.UpdatedAtTime)
             .FirstOrDefault();
 
-        return newestUpdated;
-
+        return newestUpdated ?? newestCreated;
     }
 
     public static async Task<Stats> ProcessAndSaveFilteredStatsData(ChessDbContext context, string selectedUsername)
@@ -100,21 +97,22 @@ public static class ProcessData
         foreach (var stat in statsFromMongo)
         {
             stat.ChessId = context.ChessPlayers
-                .AsQueryable()
+                .Where(cp => cp.username == selectedUsername)
                 .OrderByDescending(cp => cp.FetchedAtDate)
                 .ThenByDescending(cp => cp.FetchedAtTime)
                 .Select(cp => cp.ChessId)
                 .FirstOrDefault();
+
             
             
-            var existingPlayer = context.ChessPlayers.FirstOrDefault(p => p.ChessId == stat.ChessId);
+            ChessPlayer existingPlayer = context.ChessPlayers.FirstOrDefault(p => p.ChessId == stat.ChessId);
             if (existingPlayer == null)
             {
                 Console.WriteLine($"Player with ChessId {stat.ChessId} does not exist. Skipping stat insert.");
                 continue;
             }
 
-            var statList = context.Stats
+            List<Stats> statList = context.Stats
                 .Where(s => s.ChessId == stat.ChessId)
                 .ToList();
 
@@ -137,22 +135,22 @@ public static class ProcessData
             }
         }
 
-        var newestCreated = context.Stats
+        Stats? newestCreated = context.Stats
             .AsQueryable()
-            .Where(p => p.UpdatedAtDate == DateOnly.MinValue && p.UpdatedAtTime == TimeSpan.Zero)
+            .Where(p => p.UpdatedAtDate == DateOnly.MinValue 
+                        && p.UpdatedAtTime == TimeSpan.Zero)
             .OrderByDescending(p => p.FetchedAtDate)
             .ThenByDescending(p => p.FetchedAtTime)
             .FirstOrDefault();
 
-        if (newestCreated != null)
-            return newestCreated;
-
-        var newestUpdated = context.Stats
-            .Where(p => p.UpdatedAtDate != DateOnly.MinValue || p.UpdatedAtTime != TimeSpan.Zero)
+        Stats? newestUpdated = context.Stats
+            .AsQueryable()
+            .Where(p => p.UpdatedAtDate > DateOnly.MinValue 
+                        || p.UpdatedAtTime > TimeSpan.Zero)
             .OrderByDescending(p => p.UpdatedAtDate)
             .ThenByDescending(p => p.UpdatedAtTime)
             .FirstOrDefault();
-
-        return newestUpdated;
+        
+        return newestUpdated ?? newestCreated;
     }
 }

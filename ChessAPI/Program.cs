@@ -9,51 +9,87 @@ using Timer = System.Timers.Timer;
 
 class Program
 {
-    static async Task Main(string[] args)
+    static void Main(string[] args)
     {
         var factory = new DbContextFactory();
         var context = factory.CreateDbContext(args);
-
-        string? username = string.Empty;
-
-        // Username will become dynamic next major update
-        // These will be seated data to make a select menu
-
-        // username = "magnuscarlsen"; // Premium + no streamer
-        // username = "hikaru"; // Streamer + Premium
-        // username = "gothamchess"; // Streamer
-         username = "synx_eu"; // Basic
-        // username = "dewa_kipas"; // Banned
-        // username = "erik"; // Staff
-        // username = "nox"; // Mod
-        // username = "Mastervoliumpl"; // Jakub
-
-        string basePlayerURL = "https://api.chess.com/pub/player/";
-        string profileUrl = string.Empty;
-
-        if (!string.IsNullOrEmpty(username)
-            || !string.IsNullOrWhiteSpace(username))
+        
+        bool showMenu;
+        do
         {
-            profileUrl = basePlayerURL + username.ToLower();
+            showMenu = Menu(context).Result;
+        } while (showMenu);
+    }
+
+    private static async Task<bool> Menu(ChessDbContext context)
+    {
+        AnsiConsole.Clear();
+
+        var choice = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .Title("[bold green]=== Chess API Menu ===[/]")
+                .AddChoices(new[]
+                {
+                    "Player Search",
+                    "[red]Exit[/]"
+                }));
+
+        switch (choice)
+        {
+            case "Player Search":
+                return await PlayerSearch(context);
+            case "[red]Exit[/]":
+                AnsiConsole.MarkupLine("[yellow]Exiting...[/]");
+                return false;
+            default:
+                return true;
         }
-        else
+    }
+    
+    private static async Task<bool> PlayerSearch(ChessDbContext context)
+    {
+        AnsiConsole.Clear();
+
+        var username = AnsiConsole.Ask<string>(
+            "[bold green]Enter a Chess.com username[/] ([grey]or type [red]exit[/] to quit[/]):");
+
+        if (string.Equals(username, "exit", StringComparison.OrdinalIgnoreCase))
         {
-            Console.WriteLine($"Failed to fetch data. " +
-                              $"No username provided. " +
-                              $"Please try again.");
-            return;
+            AnsiConsole.MarkupLine("[yellow]Exiting...[/]");
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(username))
+        {
+            AnsiConsole.MarkupLine("[red]No username provided. Please try again.[/]");
+            Console.ReadKey();
+            return true;
         }
         
+        AnsiConsole.Clear();
+
+        string profileUrl = $"https://api.chess.com/pub/player/{username.ToLower()}";
+
         await DataMongo.InsertRawDataIntoMongoDB(profileUrl, username);
-        
-        // Use "de-DE" for dot (1.234), or "fr-FR" for space (1 234)
+
         CultureInfo format = new CultureInfo("de-DE");
 
-        ChessPlayerDTO player = (await LoadData.GetPlayerFromDB(context, username)).ToDTO();
-        PlayerStatsDTO stats = (await LoadData.GetStatsFromDB(context, player.ToModel())).ToDTO();
+        try
+        {
+            ChessPlayerDTO player = (await LoadData.GetPlayerFromDB(context, username)).ToDTO();
+            PlayerStatsDTO stats = (await LoadData.GetStatsFromDB(context, player.ToModel())).ToDTO();
 
-        Display(player, stats, format);
+            Display(player, stats, format);
+        }
+        catch (Exception ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Error fetching data for '{username}': {ex.Message}[/]");
+        }
 
+        AnsiConsole.MarkupLine("\n[grey]Press any key to return to the menu...[/]");
+        Console.ReadKey();
+
+        return true;
     }
 
     private static void Display(ChessPlayerDTO? player, PlayerStatsDTO stats, CultureInfo? format)

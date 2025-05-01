@@ -46,10 +46,9 @@ public class MongoDeserialize
 
     public static Stats DeserializeStats(BsonDocument doc)
     {
-        // Assuming MongoDB "id" is mapped as the logical identifier.
         Stats stats = new Stats
         {
-            fide = doc["fide"].AsInt32,
+            fide = doc.Contains("fide") ? doc["fide"].AsInt32 : 0,
             Weight = doc.Contains("weight") ? doc["Weight"].AsInt32 : 0,
             FetchedAtDate = doc.Contains("CreatedAt") 
                 ? DateOnly.FromDateTime(doc["CreatedAt"].ToUniversalTime().Date) 
@@ -61,7 +60,6 @@ public class MongoDeserialize
             UpdatedAtTime = TimeSpan.Zero
         };
 
-        // Deserialize additional fields if necessary
         stats.chess_daily = doc.Contains("chess_daily")
             ? BsonSerializer.Deserialize<ChessDaily>(doc["chess_daily"].AsBsonDocument)
             : null;
