@@ -8,22 +8,6 @@ namespace ChessAPI.Services.Services;
 
 public static class GetHistoricalData
 {
-    public static async Task<List<PlayerStatsDTO>> GetHistoryStatsFromDB(ChessDbContext context, ChessPlayer player)
-    {
-        List<Stats> statsFromDb= context.Stats
-            .Where(s => s.ChessId == player.ChessId)
-            .OrderBy(s => s.FetchedAtDate)
-            .ThenBy(s => s.FetchedAtTime)
-            .ToList();
-
-        List<PlayerStatsDTO> stats = new List<PlayerStatsDTO>();
-        
-        foreach (Stats stat in statsFromDb)
-            stats.Add(stat.ToDTO());
-        
-        return stats;
-    }
-
     public static async Task<List<ChessPlayerDTO>> GetLatestPlayersAsync(ChessDbContext context)
     {
         List<ChessPlayer> players = context.ChessPlayers
@@ -46,8 +30,21 @@ public static class GetHistoricalData
 
         return playersDTO;
     }
+    
+    public static async Task<List<PlayerStatsDTO>> GetHistoryStatsFromDB(ChessDbContext context, ChessPlayer player)
+    {
+        List<Stats> statsFromDb= context.Stats
+            .Where(s => s.ChessId == player.ChessId)
+            .OrderBy(s => s.FetchedAtDate)
+            .ThenBy(s => s.FetchedAtTime)
+            .ToList();
 
-
-
+        List<PlayerStatsDTO> stats = new List<PlayerStatsDTO>();
+        
+        foreach (Stats stat in statsFromDb)
+            stats.Add(stat.ToDTO());
+        
+        return stats;
+    }
 
 }

@@ -60,16 +60,16 @@ class Program
     {
         AnsiConsole.Clear();
 
-        var username = AnsiConsole.Ask<string>(
+        string username = AnsiConsole.Ask<string>(
             "[bold green]Enter a Chess.com username[/] ([grey]or type [red]exit[/] to quit[/]):");
 
-        if (string.Equals(username, "exit", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(username.ToLower(), "exit", StringComparison.OrdinalIgnoreCase))
         {
             AnsiConsole.MarkupLine("[yellow]Exiting...[/]");
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(username))
+        if (string.IsNullOrWhiteSpace(username.ToLower()))
         {
             AnsiConsole.MarkupLine("[red]No username provided. Please try again.[/]");
             Console.ReadKey();

@@ -1,8 +1,3 @@
-using ChessAPI.DataCollect.Helpers;
-using ChessAPI.Models;
-using MongoDB.Driver;
-using Newtonsoft.Json;
-using System.Linq;
 using MongoDB.Bson;
 
 namespace ChessAPI.DataCollect.API;
