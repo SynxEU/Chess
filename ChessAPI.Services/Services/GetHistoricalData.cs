@@ -41,7 +41,7 @@ public static class GetHistoricalData
 
         List<ChessPlayerDTO> playersDTO = new List<ChessPlayerDTO>();
     
-        foreach (var player in latestPlayers)
+        foreach (ChessPlayer player in latestPlayers)
             playersDTO.Add(player.ToDTO());
 
         return playersDTO;

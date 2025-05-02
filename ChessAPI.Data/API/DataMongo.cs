@@ -35,8 +35,8 @@ public class DataMongo
     
     public static async Task<List<BsonDocument>> GetRawStatsFromMongoDB(string selectedUsername)
     {
-        var filter = Builders<BsonDocument>.Filter.Eq("username", selectedUsername);
-        var sort = Builders<BsonDocument>.Sort.Descending("createdAt");
+        FilterDefinition<BsonDocument> filter = Builders<BsonDocument>.Filter.Eq("username", selectedUsername);
+        SortDefinition<BsonDocument> sort = Builders<BsonDocument>.Sort.Descending("createdAt");
 
         return await _statsCollection.Find(filter)
             .Sort(sort)
@@ -46,8 +46,8 @@ public class DataMongo
 
     public static async Task<List<BsonDocument>> GetRawPlayersFromMongoDB(string selectedUsername)
     {
-        var filter = Builders<BsonDocument>.Filter.Eq("username", selectedUsername);
-        var sort = Builders<BsonDocument>.Sort.Descending("createdAt");
+        FilterDefinition<BsonDocument> filter = Builders<BsonDocument>.Filter.Eq("username", selectedUsername);
+        SortDefinition<BsonDocument> sort = Builders<BsonDocument>.Sort.Descending("createdAt");
 
         return await _playersCollection.Find(filter)
             .Sort(sort)
@@ -65,7 +65,7 @@ public class DataMongo
         List<BsonDocument> rawStatsFromMongo = await GetRawStatsFromMongoDB(selectedUsername);
 
         List<Stats> statsFromMongo = rawStatsFromMongo
-            .Select(doc => MongoDeserialize.DeserializeStats(doc)) // Deserialize BsonDocument to Stats
+            .Select(doc => MongoDeserialize.DeserializeStats(doc)) 
             .ToList();
 
         return statsFromMongo;
@@ -78,7 +78,7 @@ public class DataMongo
         List<BsonDocument> rawPlayersFromMongo = await GetRawPlayersFromMongoDB(selectedUsername);
 
         List<ChessPlayer> playersFromMongo = rawPlayersFromMongo
-            .Select(doc => MongoDeserialize.DeserializeChessPlayer(doc)) // Deserialize BsonDocument to ChessPlayer
+            .Select(doc => MongoDeserialize.DeserializeChessPlayer(doc)) 
             .ToList();
 
         return playersFromMongo;

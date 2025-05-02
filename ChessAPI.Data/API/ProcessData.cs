@@ -13,7 +13,7 @@ public static class ProcessData
         
         foreach (ChessPlayer player in playersFromMongo)
         {
-            var existingPlayer = context.ChessPlayers
+            ChessPlayer existingPlayer = context.ChessPlayers
                 .FirstOrDefault(p =>
                     p.username == player.username &&
                     p.is_streamer == player.is_streamer &&
