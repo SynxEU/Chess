@@ -152,7 +152,7 @@ class Program
     private static async Task ShowHistoricalStats(ChessDbContext context, ChessPlayerDTO player)
     {
         List<PlayerStatsDTO> stats = await GetHistoricalData.GetHistoryStatsFromDB(context, player.ToModel());
-        var orderedStats = Graph.OrderStatsByDateAndTime(stats); 
+        List<PlayerStatsDTO> orderedStats = Graph.OrderStatsByDateAndTime(stats); 
 
         DateTime[] xDates = Graph.GetXDates(orderedStats);
         double[] dates = Graph.GetOADates(xDates);
