@@ -167,8 +167,9 @@ class Program
         Graph.SaveIndividualPlot(dates, blitz, "Blitz", "#F9B234");
         Graph.SaveIndividualPlot(dates, rapid, "Rapid",  "#50C878");
         Graph.SaveIndividualPlot(dates, daily, "Daily", "#FFDF22");
-        Graph.SaveIndividualPlot(dates, fide, "FIDE", "#00FFFF");
+        Graph.SaveIndividualPlot(dates, fide, "FIDE", "#000000");
 
+        AnsiConsole.MarkupLine("[green]Graphs have been saved[/]");
         AnsiConsole.MarkupLine("\n[grey]Press any key to return to the menu...[/]");
         Console.ReadKey();
 
