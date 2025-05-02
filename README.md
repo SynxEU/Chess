@@ -4,6 +4,7 @@
 1. [Om projektet](#om-projektet)
 2. [Funktionalitet](#funktionalitet)
    - [TO:DO](#to-do)
+   - [Kendte Problemer](#kendte-problemer)
 3. [Teknologier](#teknologier)
 4. [Database](#database)
 5. [Data Flow](#data-flow)
@@ -15,23 +16,29 @@
 
 ## Om projektet
 Dette projekt bruger Chess.com’s offentlige API til at hente og lagre data om spillere og deres spilstatistikker. \
-Projektet er lavet i forbindelse med et skoleprojekt i Big Data og har fokus på dataindsamling og forberedelse til senere analyse.
+Projektet er lavet i forbindelse med et skoleprojekt i Big Data og har fokus på dataindsamling og visning af historisk data.
 
 ## Funktionalitet
 - Hent spillerprofiler (brugernavn, land, medlemsdato, osv.)
 - Hent statistikker (blitz/rapid/bullet ratings og antal spil)
-- Lagring i relationel database med EF Core
+- Lagring i dokument database (MongoDB)
+- Lagring i relationel database med EF Core efter filtrering
+- Visning af grafer over historisk data
 
 ### TO:DO
-- Automatisk håndtering af dataopdatering (Hvis muligt)
-- Menu til at finde gammelt data på spiller
-- Selv at kunne indtaste spiller gennem konsolen
+- [x] Menu til at finde gammelt data på spiller
+- [ ] Grafer til at vise udviklingen af ratings
+
+### Kendte Problemer
+- Ikke alt historisk data bliver vist på nuværende tidspunkt
+- Dups af stats i SSMS
 
 ## Teknologier
 Projektet er udviklet med følgende teknologier:
 - C# / .NET 9
 - Entity Framework Core
 - SQL Server Management Studio (SSMS)
+- MongoDB
 - API ([Chess.com](https://www.chess.com/news/view/published-data-api?ref=public_apis&utm_medium=website))
 - Newtonsoft.Json (JSON håndtering)
 
@@ -59,10 +66,12 @@ Databasen inkluderer følgende entiteter: \
 Databaseforbindelsen er sat op via `ChessDbContext` og benytter en LocalDB som standard.
 
 ## Data Flow
-1. HttpClient henter JSON fra Chess.com API.
-2. JSON parses til models med Newtonsoft.Json.
-3. Data gemmes i SQL Server via Entity Framework Core.
-4. Models mappes til DTO'er og vises i konsol app
+1. HttpClient henter Data fra Chess.com API.
+2. Data parses til BsonDocument med MongoDB.
+3. Dataen gemmes ufiltret i en MongoDB
+4. Dataen hentes igen og filtres
+5. Data gemmes i SQL Server via Entity Framework Core.
+6. Models mappes til DTO'er og vises i konsol app
 
 ## Installation og Kørsel
 1. Klon projektet:
