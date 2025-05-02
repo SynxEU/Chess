@@ -24,6 +24,7 @@ Projektet er lavet i forbindelse med et skoleprojekt i Big Data og har fokus på
 - Lagring i dokument database (MongoDB)
 - Lagring i relationel database med EF Core efter filtrering
 - Visning af grafer over historisk data
+- Visning af information over spilleren
 
 ### TO:DO
 - [x] Menu til at finde gammelt data på spiller
